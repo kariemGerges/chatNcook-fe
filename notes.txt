@@ -1,0 +1,27 @@
+# FIREBASE_APIKEY=AIzaSyAJ-trvYaYtfqJq8knBO4faREWa2xF0Kek
+# FIREBASE_AUTHDOMAIN=chatcook-97557.firebaseapp.com
+# FIREBASE_PROJECTID=chatcook-97557
+# FIREBASE_STOREAGEBUCKET=chatcook-97557.appspot.com
+# FIREBASE_MESSAGINSENDERID=962237225005
+# FIREBASE_APPID=1:962237225005:web:7d4ddedf5248c6e92580a4
+import Constants from 'expo-constants';
+
+interface EnvConfig {
+  FIREBASE_APIKEY: string;
+    FIREBASE_AUTHDOMAIN: string;
+    FIREBASE_PROJECTID: string;
+    FIREBASE_STOREAGEBUCKET: string;
+    FIREBASE_MESSAGINSENDERID: string;
+    FIREBASE_APPID: string;
+}
+
+  const config = Constants.expoConfig?.extra as EnvConfig;
+
+  const { FIREBASE_APIKEY,
+    FIREBASE_AUTHDOMAIN,
+    FIREBASE_PROJECTID,
+    FIREBASE_STOREAGEBUCKET, 
+    FIREBASE_MESSAGINSENDERID,
+    FIREBASE_APPID } = config;
+
+    console.log('lma neshoof', FIREBASE_APIKEY);

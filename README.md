@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# ChatCook
 
-## Get started
+**ChatCook** is a mobile application designed to create a community where users can discover, share, and add recipes, as well as communicate through a real-time chat feature. The application is built with **React Native** using **Expo** and integrates MongoDB and Firebase for data storage and real-time chat, respectively.
 
-1. Install dependencies
+## Table of Contents
 
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Setup](#setup)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Recipe Sharing:** Users can add their own recipes, which are saved in MongoDB for quick retrieval and community sharing.
+- **Real-Time Chat:** A chat feature similar to WhatsApp enables users to connect in real time using Firebase.
+- **Home Tab:** Displays recent chats and recipes in one view.
+- **Dedicated Tabs:** Users can easily navigate between **Chats** and **Recipes** tabs for a focused experience.
+
+## Tech Stack
+
+- **Frontend:** React Native (Expo)
+- **Backend:** Firebase for real-time chat, MongoDB for recipe storage
+- **APIs:** Firebase Authentication, Firestore for chat, and MongoDB for recipes
+
+## Setup
+
+### Prerequisites
+
+1. **Node.js** and **npm** installed on your machine.
+2. **Expo CLI**: Install with `npm install -g expo-cli`.
+3. **MongoDB Database** and **Firebase Project** setup.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ChatCook.git
+   cd ChatCook
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Set up the environment variables (see below).
 
+4. Start the development server:
    ```bash
-    npx expo start
+   expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```plaintext
+.
+├── app
+│   ├── screens
+│   │   ├── HomeScreen.tsx
+│   │   ├── ChatScreen.tsx
+│   │   └── RecipesScreen.tsx
+│   └── components
+├── hooks
+│   ├── useColorScheme.ts
+│   └── useThemeColor.ts
+├── services
+│   ├── firebaseConfig.ts  // Firebase configuration and initialization
+│   ├── mongodbService.ts  // MongoDB connection and functions
+├── App.tsx
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Environment Variables
 
-## Learn more
+Create a `.env` file in the root directory and add the following environment variables:
 
-To learn more about developing your project with Expo, look at the following resources:
+```plaintext
+MONGO_URI=your_mongo_connection_string
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+FIREBASE_PROJECT_ID=your_firebase_project_id
+FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+FIREBASE_APP_ID=your_firebase_app_id
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+> Note: Replace values with your MongoDB and Firebase credentials.
 
-## Join the community
+## Usage
 
-Join our community of developers creating universal apps.
+1. **Recipe Sharing**
+   - Users can add recipes, which are stored in MongoDB and accessible to other users.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+2. **Real-Time Chat**
+   - Chat functionality allows users to communicate in real time using Firebase Firestore as the backend.
+
+3. **Navigation**
+   - The app has three main tabs: **Home**, **Chats**, and **Recipes**.
+   - **Home Tab** provides an overview of recent chats and recipe additions.
+   - **Chats Tab** and **Recipes Tab** provide focused views on communication and recipes.
+
+## Contributing
+
+Contributions are welcome! Please fork this repository and submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. 
+made with love by Kariem Gerges

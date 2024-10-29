@@ -7,6 +7,14 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "extra": {
+        "FIREBASE_APIKEY":"AIzaSyAJ-trvYaYtfqJq8knBO4faREWa2xF0Kek",
+        "FIREBASE_AUTHDOMAIN":"chatcook-97557.firebaseapp.com",
+        "FIREBASE_PROJECTID":"chatcook-97557",
+        "FIREBASE_STOREAGEBUCKET": "chatcook-97557.appspot.com",
+        "FIREBASE_MESSAGINSENDERID": "962237225005",
+        "FIREBASE_APPID":"1:962237225005:web:7d4ddedf5248c6e92580a4"
+    },
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
