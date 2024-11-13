@@ -35,7 +35,6 @@ const MobileProfile = () => {
     location: "San Francisco, CA",
     email: "alex@example.com",
     phone: "+1 (555) 123-4567",
-    website: "alexmorgan.dev",
     bio: "Product designer passionate about creating beautiful and functional interfaces",
   });
 
@@ -79,6 +78,7 @@ const MobileProfile = () => {
     }
   }, []);
 
+  // save data to the state NOT THE DATABASE YET 
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
@@ -104,12 +104,14 @@ const MobileProfile = () => {
     }
   };
 
+  // cancel editing by user 
   const handleCancel = () => {
     setEditableProfile(profile);
     setIsEditing(false);
     setValidationErrors({});
   };
 
+  // image picker to change profile photo but not the database yet
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -135,7 +137,7 @@ const MobileProfile = () => {
       Alert.alert('Error', 'Failed to pick image');
     }
   };
-
+// take photo to change profile photo but not the database yet
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -183,6 +185,7 @@ const MobileProfile = () => {
     );
   };
 
+  // render validation errors to the UI
   const renderValidationError = (field: keyof ProfileData) => {
     if (validationErrors[field]) {
       return <Text style={styles.errorText}>{validationErrors[field]}</Text>;
@@ -190,6 +193,7 @@ const MobileProfile = () => {
     return null;
   };
 
+// render info rows to the UI if editing by user
   const renderInfoRow = (icon: string, value: string, field: keyof ProfileData) => (
     <View style={styles.infoRowContainer}>
       <View style={styles.infoRow}>
@@ -221,7 +225,7 @@ const MobileProfile = () => {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <StatusBar style="light" />
       <ScrollView bounces={false}>
-        <LinearGradient colors={['#3b82f6', '#8b5cf6']} style={styles.header}>
+        <LinearGradient colors={['#FFEBC6', '#ffcfc6']} style={styles.header}>
           <View style={styles.profileImageContainer}>
             <Image
               source={profileImage ? { uri: profileImage } : { uri: 'https://via.placeholder.com/120' }}
@@ -292,7 +296,6 @@ const MobileProfile = () => {
             {renderInfoRow('location', profile.location, 'location')}
             {renderInfoRow('mail', profile.email, 'email')}
             {renderInfoRow('call', profile.phone, 'phone')}
-            {renderInfoRow('globe', profile.website || '', 'website')}
 
             <View style={styles.bioContainer}>
               {isEditing ? (
@@ -303,7 +306,8 @@ const MobileProfile = () => {
                       setEditableProfile((prev) => ({ ...prev, bio: text }));
                       validateField('bio', text);
                     }}
-                    style={[styles.bioInput, validationErrors.bio ? styles.inputError : {}]}                    multiline
+                    style={[styles.bioInput, validationErrors.bio ? styles.inputError : {}]}                    
+                    multiline
                     numberOfLines={3}
                     placeholder="Tell us about yourself"
                     editable={!isSubmitting}
@@ -333,7 +337,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   profileImageContainer: {
-    position: 'absolute',
+    position: 'static',
     bottom: -50,
     alignSelf: 'center',
   },
@@ -358,7 +362,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   content: {
-    paddingTop: 60,
+    paddingTop: 10,
     paddingHorizontal: 20,
   },
   editButtonContainer: {

@@ -12,10 +12,10 @@ export const profileSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string()
     .regex(/^\+?[\d\s-()]{10,}$/, 'Please enter a valid phone number'),
-  website: z.string()
-    .url('Please enter a valid URL')
-    .or(z.string().length(0))
-    .optional(),
+  //website: z.string()
+    //.url('Please enter a valid URL')
+   // .or(z.string().length(0))
+   // .optional(),
   bio: z.string()
     .max(500, 'Bio must be less than 500 characters')
     .min(10, 'Bio must be at least 10 characters'),
