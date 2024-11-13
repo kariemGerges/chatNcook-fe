@@ -12,8 +12,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { auth } from '@/firebaseConfig'
+import { auth, firestore } from '@/firebaseConfig'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 
 interface SignUpScreenProps {
@@ -25,13 +26,44 @@ const { width, height } = Dimensions.get('window');
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const router = useRouter();
+
+  const createUserProfile = async (userId: string, userData: any) => {
+    try {
+      const userRef = doc(firestore, 'users', userId);
+      await setDoc(userRef, userData);
+    } catch (error) {
+      console.error('Error creating user profile:', error);
+    }
+  };
 
   const handleSignUp = async () => {
     try {
       const userCredentials = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      console.log(`Successfully signed up user: ${userCredentials.user.email}`);
+      // console.log(`Successfully signed up user: ${userCredentials.user.email}`);
+      const user = userCredentials.user;
+
+      if (user) {
+        const userData = {
+          name: name,
+          email: user.email,
+          avatar: avatarUrl,
+          status: 'Available',
+          lastOnline: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          pushToken: '', // Set this when you have the device token
+          phoneNumber: phoneNumber,
+          settings: {
+            notificationsEnabled: true,
+          },
+          contacts: [],
+        };
+        await createUserProfile(user.uid, userData);
+      }
       router.push('/(tabs)/chat');
     } catch (error: any) {
       console.log(error);
@@ -78,6 +110,30 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             {/* Form Container */}
             <View style={styles.formContainer}>
               <Text style={styles.title}>Create Account</Text>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={name}
+                onChangeText={setName}
+                placeholderTextColor="#999"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Avatar URL"
+                value={avatarUrl}
+                onChangeText={setAvatarUrl}
+                placeholderTextColor="#999"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholderTextColor="#999"
+              />
               
               <TextInput
                 style={styles.input}
