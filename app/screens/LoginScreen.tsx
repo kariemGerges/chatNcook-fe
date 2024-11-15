@@ -31,7 +31,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     try {
       const userCredentials = await signInWithEmailAndPassword(auth, email.trim(), password);
       console.log(`Successfully login in user: ${userCredentials.user.email}`);
-      router.push('/(tabs)/chat');
+      router.push('/(tabs)');
     } catch (error: any) {
       console.log(error);
       switch (error.code) {

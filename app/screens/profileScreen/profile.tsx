@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,47 +11,77 @@ import {
   Animated,
   Alert,
   KeyboardAvoidingView,
+  ActivityIndicator, // Import ActivityIndicator
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
 import { StatusSelector } from '@/app/screens/profileScreen/StatusSelector';
 import { profileSchema, type ProfileData, type ValidationErrors } from '@/app/screens/profileScreen/validation';
-import { z } from 'zod';  // Import Zod for schema validation
+import { UserData } from '@/assets/types/types';
+import { z } from 'zod';
+import useUserProfileData from '@/hooks/useUserProfileData';
+import { router } from 'expo-router';
+import { getAuth, signOut } from 'firebase/auth';
+
+
+const defaultProfileData: ProfileData = {
+  name: '',
+  email: '',
+  phoneNumber: '',
+  bio: '',
+  status: 'Available',
+  avatar: '',
+  contacts: [],
+  createdAt: {},
+  lastOnline: {},
+  pushToken: '',
+  settings: {
+    notificationsEnabled: true,
+  },
+  uid: '',
+};
 
 const MobileProfile = () => {
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isEditing, setIsEditing] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Getting user data
+  const { user, profileData, loading, error } = useUserProfileData();
+  const [profileImage, setProfileImage] = useState<string | null>(profileData?.avatar ?? null);
+  // Initialize profile and editableProfile with default values
+  const [profile, setProfile] = useState<ProfileData>(defaultProfileData);
+  const [editableProfile, setEditableProfile] = useState<ProfileData>(defaultProfileData);
 
-  // user data state
-  const [profile, setProfile] = useState<ProfileData>({
-    name: "Alex Morgan",
-    status: "Available",
-    location: "San Francisco, CA",
-    email: "alex@example.com",
-    phone: "+1 (555) 123-4567",
-    bio: "Product designer passionate about creating beautiful and functional interfaces",
-  });
+  // Update profile when profileData changes
+  useEffect(() => {
+    if (profileData) {
+      setProfile(profileData);
+      setEditableProfile(profileData);
+    }
+  }, [profileData]);
 
-  const [editableProfile, setEditableProfile] = useState<ProfileData>(profile);
+  // redirect to login screen if user is not logged in
+  useEffect(() => {
+    if (!loading && (!user || !profileData)) {
+      router.replace('/screens/LoginScreen');
+    }
+  }, [loading, user, profileData, router]);
+  
 
   // Status options
   const statusOptions = useMemo(
     () => [
-      { label: "Available" as const, color: "#22c55e" },
-      { label: "Busy" as const, color: "#ef4444" },
-      { label: "Away" as const, color: "#eab308" },
+      { label: 'Available' as const, color: '#22c55e' },
+      { label: 'Busy' as const, color: '#ef4444' },
+      { label: 'Away' as const, color: '#eab308' },
     ],
     []
   );
 
-
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
@@ -59,7 +89,7 @@ const MobileProfile = () => {
     }).start();
   }, []);
 
-  // validate data
+  // Validate data
   const validateField = useCallback((field: keyof ProfileData, value: string) => {
     try {
       profileSchema.shape[field].parse(value);
@@ -78,7 +108,7 @@ const MobileProfile = () => {
     }
   }, []);
 
-  // save data to the state NOT THE DATABASE YET 
+  // Save data to the state (NOT THE DATABASE YET)
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
@@ -94,7 +124,8 @@ const MobileProfile = () => {
         const errors: ValidationErrors = {};
         error.errors.forEach((err) => {
           if (err.path[0]) {
-            errors[err.path[0] as keyof ValidationErrors] = err.message;          }
+            errors[err.path[0] as keyof ValidationErrors] = err.message;
+          }
         });
         setValidationErrors(errors);
         Alert.alert('Validation Error', 'Please fix the errors before saving.');
@@ -104,14 +135,26 @@ const MobileProfile = () => {
     }
   };
 
-  // cancel editing by user 
+  // Cancel editing by user
   const handleCancel = () => {
     setEditableProfile(profile);
     setIsEditing(false);
     setValidationErrors({});
   };
 
-  // image picker to change profile photo but not the database yet
+  // handle sign out
+  const handleSignOut = async () => {
+    const auth = getAuth(); // Get the current Firebase Auth instance
+  
+    try {
+      await signOut(auth); // Sign out the user
+      console.log('User signed out successfully');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  // Image picker to change profile photo but not the database yet
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -137,7 +180,8 @@ const MobileProfile = () => {
       Alert.alert('Error', 'Failed to pick image');
     }
   };
-// take photo to change profile photo but not the database yet
+
+  // Take photo to change profile photo but not the database yet
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -185,7 +229,7 @@ const MobileProfile = () => {
     );
   };
 
-  // render validation errors to the UI
+  // Render validation errors to the UI
   const renderValidationError = (field: keyof ProfileData) => {
     if (validationErrors[field]) {
       return <Text style={styles.errorText}>{validationErrors[field]}</Text>;
@@ -193,24 +237,20 @@ const MobileProfile = () => {
     return null;
   };
 
-// render info rows to the UI if editing by user
+  // Render info rows to the UI if editing by user
   const renderInfoRow = (icon: string, value: string, field: keyof ProfileData) => (
     <View style={styles.infoRowContainer}>
       <View style={styles.infoRow}>
         <Ionicons name={icon as any} size={20} color="#9ca3af" />
         {isEditing ? (
           <TextInput
-            value={editableProfile[field]}
+            value={editableProfile[field] as string}
             onChangeText={(text) => {
               setEditableProfile((prev) => ({ ...prev, [field]: text }));
               validateField(field, text);
             }}
-            style={[
-                styles.input,
-                validationErrors[field]
-                  ? styles.inputError
-                  : undefined,
-              ]}            placeholder={`Enter ${field}`}
+            style={[styles.input, validationErrors[field] ? styles.inputError : undefined]}
+            placeholder={`Enter ${field}`}
             editable={!isSubmitting}
           />
         ) : (
@@ -221,18 +261,44 @@ const MobileProfile = () => {
     </View>
   );
 
+  // Handle loading and error states
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4b5563" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error.message}</Text>
+      </View>
+    );
+  }
+
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <StatusBar style="light" />
       <ScrollView bounces={false}>
         <LinearGradient colors={['#FFEBC6', '#ffcfc6']} style={styles.header}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={profileImage ? { uri: profileImage } : { uri: 'https://via.placeholder.com/120' }}
+              source={
+                profileImage ? { uri: profileImage } : { uri: 'https://via.placeholder.com/120' }
+              }
               style={styles.profileImage}
             />
             {isEditing && (
-              <TouchableOpacity style={styles.cameraButton} onPress={showImageOptions} disabled={isSubmitting}>
+              <TouchableOpacity
+                style={styles.cameraButton}
+                onPress={showImageOptions}
+                disabled={isSubmitting}
+              >
                 <Ionicons name="camera" size={20} color="#4b5563" />
               </TouchableOpacity>
             )}
@@ -240,17 +306,38 @@ const MobileProfile = () => {
         </LinearGradient>
 
         <View style={styles.content}>
+            <View style={styles.editOUTActions}>
+                  <TouchableOpacity
+                    onPress={() => handleSignOut()}
+                    style={styles.iconButton}
+                    disabled={isSubmitting}
+                  >
+                    <Ionicons name="log-out" size={20} color="#4b5563" />
+                  </TouchableOpacity>
+            </View>
           <View style={styles.editButtonContainer}>
             {!isEditing ? (
-              <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.iconButton} disabled={isSubmitting}>
-                <Ionicons name="pencil" size={20} color="#4b5563" />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setIsEditing(true)}
+                  style={styles.iconButton}
+                  disabled={isSubmitting}
+                >
+                  <Ionicons name="pencil" size={20} color="#4b5563" />
+                </TouchableOpacity>
             ) : (
               <View style={styles.editActions}>
-                <TouchableOpacity onPress={handleSave} style={[styles.iconButton, { marginRight: 8 }]} disabled={isSubmitting}>
-                  <Ionicons name={isSubmitting ? "hourglass" : "checkmark"} size={20} color="#22c55e" />
+                <TouchableOpacity
+                  onPress={handleSave}
+                  style={[styles.iconButton, { marginRight: 8 }]}
+                  disabled={isSubmitting}
+                >
+                  <Ionicons name={isSubmitting ? 'hourglass' : 'checkmark'} size={20} color="#22c55e" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleCancel} style={styles.iconButton} disabled={isSubmitting}>
+                  <TouchableOpacity
+                    onPress={handleCancel}
+                    style={styles.iconButton}
+                    disabled={isSubmitting}
+                  >
                   <Ionicons name="close" size={20} color="#ef4444" />
                 </TouchableOpacity>
               </View>
@@ -259,19 +346,25 @@ const MobileProfile = () => {
 
           <View style={styles.profileInfo}>
             {isEditing ? (
-              <TextInput
-                value={editableProfile.name}
-                onChangeText={(text) => {
-                  setEditableProfile((prev) => ({ ...prev, name: text }));
-                  validateField('name', text);
-                }}
-                style={[styles.nameInput, validationErrors.name ? styles.inputError : {}]}                placeholder="Enter name"
-                editable={!isSubmitting}
-              />
+              <>
+                <TextInput
+                  value={editableProfile.name}
+                  onChangeText={(text) => {
+                    setEditableProfile((prev) => ({ ...prev, name: text }));
+                    validateField('name', text);
+                  }}
+                  style={[
+                    styles.nameInput,
+                    validationErrors.name ? styles.inputError : undefined,
+                  ]}
+                  placeholder="Enter name"
+                  editable={!isSubmitting}
+                />
+                {renderValidationError('name')}
+              </>
             ) : (
               <Text style={styles.name}>{profile.name}</Text>
             )}
-            {renderValidationError('name')}
 
             {isEditing ? (
               <StatusSelector
@@ -293,9 +386,8 @@ const MobileProfile = () => {
           </View>
 
           <View style={styles.infoContainer}>
-            {renderInfoRow('location', profile.location, 'location')}
             {renderInfoRow('mail', profile.email, 'email')}
-            {renderInfoRow('call', profile.phone, 'phone')}
+            {renderInfoRow('call', profile.phoneNumber ?? '', 'phoneNumber')}
 
             <View style={styles.bioContainer}>
               {isEditing ? (
@@ -306,7 +398,7 @@ const MobileProfile = () => {
                       setEditableProfile((prev) => ({ ...prev, bio: text }));
                       validateField('bio', text);
                     }}
-                    style={[styles.bioInput, validationErrors.bio ? styles.inputError : {}]}                    
+                    style={[styles.bioInput, validationErrors.bio ? styles.inputError : undefined]}
                     multiline
                     numberOfLines={3}
                     placeholder="Tell us about yourself"
@@ -329,6 +421,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
   header: {
     height: 200,
@@ -362,7 +458,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   content: {
-    paddingTop: 10,
+    paddingTop: 60,
     paddingHorizontal: 20,
   },
   editButtonContainer: {
@@ -371,6 +467,10 @@ const styles = StyleSheet.create({
   },
   editActions: {
     flexDirection: 'row',
+  },
+  editOUTActions: {
+    flexDirection: 'row',
+    marginTop: 16,
   },
   iconButton: {
     padding: 8,
@@ -457,20 +557,23 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     lineHeight: 20,
   },
+  infoRowContainer: {
+    marginBottom: 12,
+  },
+  inputError: {
+    borderBottomColor: 'red',
+  },
   errorText: {
-    color: '#ef4444',
+    color: 'red',
     fontSize: 12,
     marginTop: 4,
     marginLeft: 32,
   },
-  inputError: {
-    borderBottomColor: '#ef4444',
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
   },
-  infoRowContainer: {
-    marginBottom: 8,
-  }
-
-  
 });
 
 export default MobileProfile;

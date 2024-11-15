@@ -1,4 +1,5 @@
 import { ViewStyle } from "react-native";
+import { User } from "firebase/auth";
 
 export interface Recipe {
     _id: string;
@@ -89,5 +90,29 @@ export interface Recipe {
   }
 
 
-  // StatusOptions type
-  
+  // user type
+  export interface UserData {
+    avatar: string;
+    contacts: string[];
+    createdAt: Record<string, string>;
+    email: string;
+    lastOnline: Record<string, number>;
+    name: string;
+    phoneNumber: string;
+    pushToken: string;
+    settings: {
+      notificationsEnabled: boolean;
+    };
+    bio: string;
+    uid: string;
+    status: string;
+    
+  }
+
+
+  export interface UserProfile {
+    user: User | null;
+    profileData: UserData | null;
+    loading: boolean;
+    error: string | null;
+  }
