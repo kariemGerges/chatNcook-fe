@@ -122,7 +122,15 @@ export interface Recipe {
     user: User | null;
     profileData: UserData | null;
     loading: boolean;
+    userError:  string | null;
+    refetch: () => void;
+  }
+
+  export interface DataChatsAndMessages {
+    data: ChatDate | null;
+    loading: boolean;
     error: string | null;
+    refetch: () => void;
   }
 
   // chat type
@@ -143,7 +151,7 @@ export interface Chats {
   createdBy: string;
   isGroupChat: boolean;
   lastMessage: string;
-  lastUpdated: Date;
+  lastUpdated: number;
   participants: string[];
   typing: TypingUser[];
   unreadCounts: Map<string, number>;
@@ -172,4 +180,5 @@ export interface Message {
 export interface ChatDate {
   chats: Chats[];
   messages: Message[];
+  
 }

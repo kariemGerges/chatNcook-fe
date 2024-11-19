@@ -8,7 +8,7 @@ const useUserProfile = (): UserProfile => {
   const [user, setUser] = useState<User | null>(null); // Authenticated user
   const [profileData, setProfileData] = useState<UserData | null>(null); // Firestore profile data
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [userError, setUserError] = useState<string | null>(null);
 
   useEffect(() => {
     // Listen for auth state changes
@@ -26,8 +26,8 @@ const useUserProfile = (): UserProfile => {
             console.log('No profile data found in Firestore');
           }
         } catch (err) {
-          console.error('Error fetching user profile data:', err);
-          setError((err as Error).message);
+          console.error('userError fetching user profile data:', err);
+          setUserError((err as Error).message);
         }
       } else {
         setUser(null);
@@ -40,7 +40,7 @@ const useUserProfile = (): UserProfile => {
     return () => unsubscribe();
   }, []);
 
-  return { user, profileData, loading, error };
+  return { user, profileData, loading, userError, refetch: () => {} };
 };
 
 export default useUserProfile;

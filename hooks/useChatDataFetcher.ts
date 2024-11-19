@@ -7,9 +7,9 @@ import {
     where,
     orderBy,
 } from "firebase/firestore";
-import { Chats, ChatDate, Message } from "@/assets/types/types";
+import { Chats, ChatDate, Message, DataChatsAndMessages } from "@/assets/types/types";
 
-const useChatDataFetcher = (userId: string | null) => {
+const useChatDataFetcher = (userId: string | null) : DataChatsAndMessages => {
     const [data, setData] = useState<ChatDate>({ chats: [], messages: [] });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -100,7 +100,7 @@ const useChatDataFetcher = (userId: string | null) => {
         }
     }, [userId]);
 
-    return { data, loading, error };
+    return { data, loading, error, refetch: () => {} };
 };
 
 export default useChatDataFetcher;
