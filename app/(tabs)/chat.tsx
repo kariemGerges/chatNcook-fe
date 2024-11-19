@@ -1,7 +1,10 @@
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { StyleSheet, FlatList } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import useUserProfileData from '@/hooks/useUserProfileData';
+import useUserChatFetcher from '@/hooks/useChatDataFetcher';
+import useUserChatMessagesFetcher from '@/hooks/useChatMessageFetcher';
+import { Chats } from '@/assets/types/types';
+import { useEffect, useState } from 'react';
+import { set } from 'zod';
 
 interface ChatItem {
     id: string;
@@ -17,37 +20,47 @@ interface ChatItem {
   ]
 
 
-export default function ChatScreen() {
+
+const ChatScreen =({ chatId }: { chatId: string[] })=> {
+
+// Getting user data
+  // const {user, profileData, loading, error } = useUserProfileData();
+
+// Getting chat data which includes user's chats and messages in each chat
+  // const { data, loading: loadingChats, error: errorChats } = useUserChatFetcher(user?.uid ?? null);
+
 
     return (
-        <ParallaxScrollView
-        // style={styles.container}
-        >
+        <View>
     
-          <ThemedView style={styles.header}>
-            <ThemedText style={styles.name}>Kariem Gerges</ThemedText>
-            <ThemedView style={styles.profileImageContainer}>
-              <ThemedView style={styles.profileImage} />
-            </ThemedView>
-          </ThemedView>
+          <View style={styles.header}>
+            <Text style={styles.name}>
+              {/* {profileData?.name} */} hardcode name
+              </Text>
+            <View style={styles.profileImageContainer}>
+              <Image source={{ 
+                // uri: profileData?.avatar 
+                }} style={styles.profileImage} />
+            </View>
+          </View>
     
     
-          <ThemedView style={styles.recentChatsContainer}>
-            <ThemedText style={styles.recentChatsTitle}>Chats</ThemedText>
+          <View style={styles.recentChatsContainer}>
+            <Text style={styles.recentChatsTitle}>Chats</Text>
             
             <FlatList
               data={recentChats}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
     
-                <ThemedView style={styles.chatItem}>
-                  <ThemedView style={styles.chatAvatar} />
-                    <ThemedView style={styles.chatInfo}>
-                        <ThemedText style={styles.chatName}>{item.name}</ThemedText>
-                        <ThemedText style={styles.chatMessage}>{item.message}</ThemedText>
-                    </ThemedView>
-                    <ThemedText style={styles.chatTime}>{item.time}</ThemedText>
-                </ThemedView>
+                <View style={styles.chatItem}>
+                  <View style={styles.chatAvatar} />
+                    <View style={styles.chatInfo}>
+                        <Text style={styles.chatName}>{item.name}</Text>
+                        <Text style={styles.chatMessage}>{item.message}</Text>
+                    </View>
+                    <Text style={styles.chatTime}>{item.time}</Text>
+                </View>
     
               )}
             />
@@ -57,14 +70,14 @@ export default function ChatScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
     
-                <ThemedView style={styles.chatItem}>
-                  <ThemedView style={styles.chatAvatar} />
-                    <ThemedView style={styles.chatInfo}>
-                        <ThemedText style={styles.chatName}>{item.name}</ThemedText>
-                        <ThemedText style={styles.chatMessage}>{item.message}</ThemedText>
-                    </ThemedView>
-                    <ThemedText style={styles.chatTime}>{item.time}</ThemedText>
-                </ThemedView>
+                <View style={styles.chatItem}>
+                  <View style={styles.chatAvatar} />
+                    <View style={styles.chatInfo}>
+                        <Text style={styles.chatName}>{item.name}</Text>
+                        <Text style={styles.chatMessage}>{item.message}</Text>
+                    </View>
+                    <Text style={styles.chatTime}>{item.time}</Text>
+                </View>
                 
               )}
             />
@@ -74,24 +87,26 @@ export default function ChatScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
     
-                <ThemedView style={styles.chatItem}>
-                  <ThemedView style={styles.chatAvatar} />
-                    <ThemedView style={styles.chatInfo}>
-                        <ThemedText style={styles.chatName}>{item.name}</ThemedText>
-                        <ThemedText style={styles.chatMessage}>{item.message}</ThemedText>
-                    </ThemedView>
-                    <ThemedText style={styles.chatTime}>{item.time}</ThemedText>
-                </ThemedView>
+                <View style={styles.chatItem}>
+                  <View style={styles.chatAvatar} />
+                    <View style={styles.chatInfo}>
+                        <Text style={styles.chatName}>{item.name}</Text>
+                        <Text style={styles.chatMessage}>{item.message}</Text>
+                    </View>
+                    <Text style={styles.chatTime}>{item.time}</Text>
+                </View>
                 
               )}
             />
     
-          </ThemedView>
+          </View>
     
-        </ParallaxScrollView>
+        </View>
       );
 
 }
+
+export default ChatScreen;
 
 const styles = StyleSheet.create({
     container: {

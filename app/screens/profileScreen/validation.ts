@@ -11,8 +11,10 @@ export const profileSchema = z.object({
     .optional(),
   avatar: z.string().url('Please enter a valid URL').optional(),
   contacts: z.array(z.string()).optional(),
-  createdAt: z.record(z.string(), z.string()).optional(),  // For map structure
-  lastOnline: z.record(z.string(), z.number()).optional(),
+  //createdAt: z.record(z.string(), z.string()).optional(),  // For map structure
+  createdAt: z.any().optional(),
+  lastOnline: z.any().optional(),
+  // lastOnline: z.record(z.string(), z.number()).optional(),
   pushToken: z.string().optional(),
   settings: z.object({
     notificationsEnabled: z.boolean(),
@@ -21,7 +23,7 @@ export const profileSchema = z.object({
     .max(100, 'Bio must be less than 500 characters')
     .min(10, 'Bio must be at least 10 characters')
     .optional(),
-  uid: z.string(),
+  uid: z.any().optional(),
   bio: z.string()
     .max(100, 'Bio must be less than 500 characters')
     .min(10, 'Bio must be at least 10 characters')

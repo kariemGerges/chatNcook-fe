@@ -94,9 +94,17 @@ export interface Recipe {
   export interface UserData {
     avatar: string;
     contacts: string[];
-    createdAt: Record<string, string>;
+    // createdAt: Record<string, string>;
+    createdAt: {
+      _seconds: number;
+      _nanoseconds: number;
+    };
     email: string;
-    lastOnline: Record<string, number>;
+    // lastOnline: Record<string, number>;
+    lastOnline: {
+      _seconds: number;
+      _nanoseconds: number;
+    };
     name: string;
     phoneNumber: string;
     pushToken: string;
@@ -104,11 +112,11 @@ export interface Recipe {
       notificationsEnabled: boolean;
     };
     bio: string;
-    uid: string;
+    uid: string | undefined;
     status: string;
     
   }
-
+  
 
   export interface UserProfile {
     user: User | null;
@@ -116,3 +124,52 @@ export interface Recipe {
     loading: boolean;
     error: string | null;
   }
+
+  // chat type
+  
+  // typing
+interface TypingUser {
+  userId: string;
+  timestamp: Date;
+}
+
+// chat
+export interface Chats {
+  id: string;
+  admin: string[];
+  chatAvatar: string;
+  chatName: string;
+  createdAt: Date;
+  createdBy: string;
+  isGroupChat: boolean;
+  lastMessage: string;
+  lastUpdated: Date;
+  participants: string[];
+  typing: TypingUser[];
+  unreadCounts: Map<string, number>;
+}
+
+
+
+// message type
+export interface Message {
+  //id: string;
+  createdAt: Date;
+  deleted: boolean;
+  imageUrl: string;
+  readBy: string[];
+  system: boolean;
+  text: string;
+  type: string;
+  user: {
+    avatar: string;
+    name: string;
+    uid: string;
+  };
+}
+
+// chatDate type that combines the chat and messages
+export interface ChatDate {
+  chats: Chats[];
+  messages: Message[];
+}

@@ -34,8 +34,8 @@ const defaultProfileData: ProfileData = {
   status: 'Available',
   avatar: '',
   contacts: [],
-  createdAt: {},
-  lastOnline: {},
+  createdAt: {'': ''},
+  lastOnline: {'': 0},
   pushToken: '',
   settings: {
     notificationsEnabled: true,
@@ -128,7 +128,8 @@ const MobileProfile = () => {
           }
         });
         setValidationErrors(errors);
-        Alert.alert('Validation Error', 'Please fix the errors before saving.');
+        Alert.alert(error.message, 'Validation Error - Please fix the errors before saving.');
+        console.error(error);
       }
     } finally {
       setIsSubmitting(false);
@@ -273,7 +274,7 @@ const MobileProfile = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error: {error.message}</Text>
+        <Text style={styles.errorText}>Error: {(error as any).message}</Text>
       </View>
     );
   }
@@ -525,11 +526,17 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     gap: 16,
+    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#f3f4f6',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+
   },
   infoText: {
     flex: 1,
