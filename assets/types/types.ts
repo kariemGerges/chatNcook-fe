@@ -1,5 +1,6 @@
 import { ViewStyle } from "react-native";
 import { User } from "firebase/auth";
+import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
 export interface Recipe {
     _id: string;
@@ -181,4 +182,13 @@ export interface ChatDate {
   chats: Chats[];
   messages: Message[];
   
+}
+
+
+// redux types
+export interface ChatState {
+  chats: Chats[];
+  messages: Record<string, Message[]>;
+  loading: boolean;
+  error: string | null;
 }

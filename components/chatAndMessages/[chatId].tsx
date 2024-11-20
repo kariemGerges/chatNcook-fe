@@ -1,11 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, FlatList, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, FlatList, TextInput, TouchableOpacity, Text} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { MessageItem } from '@/components/chatAndmessages/MessageItem';
-import { styles } from '../../utils/styles';
 import { Ionicons } from '@expo/vector-icons';
 
-const sampleMessages = [
+// Message Interface
+interface Message {
+  id: string;
+  content: string;
+  timestamp: Date;
+  senderId: string;
+  type: 'text' | 'image' | 'file';
+  status: 'sending' | 'sent' | 'read' | 'failed';
+  replyTo?: string | null;
+}
+
+// Sample Messages
+const sampleMessages: Message[] = [
   {
     id: '1',
     content: 'Hello, how are you?',
@@ -26,15 +36,30 @@ const sampleMessages = [
   },
 ];
 
-export default function ChatScreen() {
-  const { chatId } = useLocalSearchParams();
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState(sampleMessages);
-  const flatListRef = useRef(null);
+// MessageItem Component (you can create a separate file for this)
+const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
+  return (
+    <View style={{ 
+      backgroundColor: message.senderId === 'currentUser' ? '#007AFF' : '#E9ECEF',
+      padding: 10,
+      borderRadius: 10,
+      marginVertical: 5
+    }}>
+      <Text>{message.content}</Text>
+    </View>
+  );
+};
 
+export default function ChatScreen() {
+  const { chatId } = useLocalSearchParams<{ chatId: string }>();
+  const [message, setMessage] = useState<string>('');
+  const [messages, setMessages] = useState<Message[]>(sampleMessages);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Send messages
   const handleSend = () => {
     if (message.trim()) {
-      const newMessage = {
+      const newMessage: Message = {
         id: Date.now().toString(),
         content: message,
         timestamp: new Date(),
@@ -51,7 +76,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -60,7 +85,13 @@ export default function ChatScreen() {
         contentContainerStyle={{ padding: 16 }}
       />
 
-      <View style={styles.inputContainer}>
+      <View style={{ 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        padding: 16, 
+        borderTopWidth: 1, 
+        borderTopColor: '#E9ECEF' 
+      }}>
         <TextInput
           style={{
             flex: 1,

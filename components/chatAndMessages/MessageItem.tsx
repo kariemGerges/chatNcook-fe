@@ -71,7 +71,7 @@ export function MessageItem({ message, onReply }: MessageItemProps) {
             color: isSentByMe ? 'rgba(255,255,255,0.7)' : '#666',
             marginRight: 4,
           }}>
-            {formatTime(message.timestamp)}
+            {/* {formatTime(message.timestamp)} */}
           </Text>
           {isSentByMe && renderMessageStatus()}
         </View>
