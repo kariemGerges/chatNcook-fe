@@ -19,21 +19,23 @@ export default {
       eas: {
         projectId: "c500099c-ee9d-47b3-8477-38f9a135610f"
       }
-      
     },
     splash: {
       image: "./assets/images/splash.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
+    jsEngine: "hermes",
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
+      newArchEnabled: true
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
-      }
+      },
+      newArchEnabled: true
     },
     web: {
       bundler: "metro",
@@ -48,7 +50,18 @@ export default {
           "cameraPermission": "The app needs access to your camera to take photos."
         }
       ],
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            newArchEnabled: true
+          },
+          ios: {
+            newArchEnabled: true
+          }
+        }
+      ]
     ],
     experiments: {
       typedRoutes: true

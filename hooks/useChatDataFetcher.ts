@@ -56,7 +56,6 @@ const useChatDataFetcher = (userId: string | null) : DataChatsAndMessages => {
                             messagesQuery,
                             (messageSnapshot) => {
                                 const messages = messageSnapshot.docs.map((doc) => ({
-                                    id: doc.id,
                                     ...(doc.data() as Message),
                                 }));
 

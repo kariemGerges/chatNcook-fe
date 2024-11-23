@@ -1,26 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
-interface Recipe {
-    _id: string;
-    id: number;
-    title: string;
-    description: string;
-    image_url: string;
-    ingredients: string[];
-    preparation_steps: string;
-    preparation_time: string;
-    country_of_origin: string;
-    author: string;
-    tags: string[];
-    category: string;
-}
-
-interface UseCarouselRecipeResponse {
-    recipe: Recipe[] | [];
-    loading: boolean;
-    error: string | null; // Use string for better error message handling
-}
+import { Recipe, UseCarouselRecipeResponse } from "../assets/types/types";
 
 export const useCarouselRecipe = (): UseCarouselRecipeResponse => {
     const [recipe, setRecipe] = useState<Recipe[]>([]);

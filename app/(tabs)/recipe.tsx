@@ -1,4 +1,3 @@
-// app/(tabs)/recipe.tsx
 import { StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import React, { memo, useCallback, useMemo } from 'react';
 import { ThemedText } from '@/components/ThemedText';
@@ -7,6 +6,7 @@ import useRecipeScreenFetcher from '@/hooks/useRecipeScreenFetcher';
 import {RecipeCard} from '@/components/RecipeCard';
 import { Recipe } from '@/assets/types/types';
 import { router } from 'expo-router';
+import SkeletonLoadingItem from '@/components/SkeletonLoadingItem';
 
 // Memoized header component to prevent unnecessary re-renders
 const Header = memo(() => (
@@ -30,7 +30,7 @@ const LoadingIndicator = memo(() => (
 
 // Memoized footer loading component
 const ListFooter = memo(({ loading }: { loading: boolean }) => (
-    loading ? <ActivityIndicator /> : null
+    loading ? <SkeletonLoadingItem/> : null
 ));
 
 // Memoized recipe card wrapper
@@ -49,7 +49,7 @@ export default function RecipeScreen() {
     }, [error]);
 
     // Memoized render item function
-    const renderItem = useCallback(({ item }: { item: Recipe }) => (
+    const renderRecipeItem = useCallback(({ item }: { item: Recipe }) => (
         <TouchableOpacity onPress={() =>
             router.push({
                 pathname: '/screens/singleRecipe',
@@ -61,17 +61,17 @@ export default function RecipeScreen() {
     ), []);
 
     // Memoized key extractor
-    const keyExtractor = useCallback((item: Recipe) => item._id, []);
+    const keyExtractor = useCallback((item: Recipe) => item._id.toString(), []);
 
     // Memoized list footer component
     const listFooterComponent = useMemo(() => (
         <ListFooter loading={loading} />
     ), [loading]);
 
-    // Memoized getItemLayout for fixed height items (adjust height value based on your RecipeCard)
-    const getItemLayout = useCallback((data: Recipe[] | null, index: number) => ({
-        length: 150,
-        offset: 200 * index,
+    // Memoized getItemLayout for fixed height items
+    const getItemLayout = useCallback((data: ArrayLike<Recipe> | null | undefined, index: number) => ({
+        length: 150, // Adjust this value to match your actual RecipeCard height
+        offset: 150 * index,
         index,
     }), []);
 
@@ -86,8 +86,6 @@ export default function RecipeScreen() {
         <ThemedView style={styles.container}>
             <Header />
             <SectionTitle />
-
-            {/* Recipe list */}
             
             <ThemedView style={styles.listContainer}>
                 {loading && recipes.length === 0 ? (
@@ -96,7 +94,7 @@ export default function RecipeScreen() {
                     <FlatList
                         data={recipes}
                         keyExtractor={keyExtractor}
-                        renderItem={renderItem}
+                        renderItem={renderRecipeItem}
                         onEndReached={handleEndReached}
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={listFooterComponent}
@@ -104,15 +102,18 @@ export default function RecipeScreen() {
                         onRefresh={refresh}
                         contentContainerStyle={styles.flatListContent}
                         getItemLayout={getItemLayout}
-                        removeClippedSubviews={true}
-                        initialNumToRender={10}
-                        maxToRenderPerBatch={5}
-                        windowSize={5}
-                        updateCellsBatchingPeriod={50}
+                        removeClippedSubviews={true} 
+                        initialNumToRender={5} 
+                        maxToRenderPerBatch={10} 
+                        windowSize={21} // Increased from 5 to 21 (each window is 10 items)
+                        updateCellsBatchingPeriod={100} // Increased from 50 to 100ms
+                        maintainVisibleContentPosition={{
+                            minIndexForVisible: 0,
+                            autoscrollToTopThreshold: 10
+                        }}
                     />
                 )}
             </ThemedView>
-
         </ThemedView>
     );
 }

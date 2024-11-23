@@ -1,6 +1,6 @@
 import { ViewStyle } from "react-native";
 import { User } from "firebase/auth";
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
 export interface Recipe {
     _id: string;
@@ -56,6 +56,12 @@ export interface Recipe {
     cardStyle?: ViewStyle;
     containerStyle?: ViewStyle;
   }
+
+  export interface UseCarouselRecipeResponse {
+    recipe: Recipe[] | [];
+    loading: boolean;
+    error: string | null; // Use string for better error message handling
+}
 
 
   export interface ChatItem {
@@ -158,12 +164,10 @@ export interface Chats {
   unreadCounts: Map<string, number>;
 }
 
-
-
 // message type
 export interface Message {
-  //id: string;
-  createdAt: Date;
+  id: string;
+  createdAt: number;
   deleted: boolean;
   imageUrl: string;
   readBy: string[];
@@ -175,6 +179,15 @@ export interface Message {
     name: string;
     uid: string;
   };
+  senderId: string;
+  edited: boolean;
+  editedAt: null;
+  reactions: [];
+  replyTo: null;
+  attachments: [];
+  seenBy: [];
+  priority: string;
+  deliveryStatus: string;
 }
 
 // chatDate type that combines the chat and messages

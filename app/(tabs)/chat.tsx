@@ -15,34 +15,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Href, useRouter } from 'expo-router';
 import { RootState, AppDispatch } from '@/store';
 import { listenToUserChats } from '@/store/chatThunks';
-import { Chats } from '@/assets/types/types';
+import { UserData } from '@/assets/types/types';
 import useUserProfileData from '@/hooks/useUserProfileData';
-
-// Loading Skeleton component
-const SkeletonChatItem = () => (
-  <View style={styles.chatItem}>
-    <LinearGradient
-      colors={['#F5F5F5', '#FFFFFF', '#F5F5F5']}
-      style={styles.skeletonAvatar}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-    />
-    <View style={styles.chatInfo}>
-      <LinearGradient
-        colors={['#F0F0F0', '#FFFFFF', '#F0F0F0']}
-        style={styles.skeletonTitle}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      />
-      <LinearGradient
-        colors={['#F0F0F0', '#FFFFFF', '#F0F0F0']}
-        style={styles.skeletonSubtitle}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      />
-    </View>
-  </View>
-);
+import SkeletonLoadingChatItem  from '@/components/SkeletonLoadingItem';
+import { COLORS } from '@/constants/Colors';
 
 const ChatScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -104,8 +80,18 @@ const ChatScreen: React.FC = () => {
 
   // Function to navigate to [chat by id]
   const navigateToChat = useCallback(
-    (chatId: string) => {
-      router.push(`/components/chatAndMessages/${chatId}` as Href<string | object>);
+    (chatId: string, profileData: UserData) => {
+      router.push({
+        pathname: `/screens/chatAndMessages/[chatId]` as const,
+        params : { 
+            chatId,
+            userName : profileData.name,
+            userAvatar : profileData.avatar,
+            userUid : profileData.uid,
+            userStatus : profileData.status
+        }
+
+    });
     },
     [router]
   );
@@ -136,7 +122,7 @@ const ChatScreen: React.FC = () => {
         <View style={styles.recentChatsContainer}>
           <Text style={styles.recentChatsTitle}>Chats</Text>
           {[...Array(5)].map((_, index) => (
-            <SkeletonChatItem key={index} />
+            <SkeletonLoadingChatItem key={index} />
           ))}
         </View>
       </View>
@@ -207,7 +193,7 @@ const ChatScreen: React.FC = () => {
           }
           renderItem={({ item }) => (
             <TouchableOpacity 
-              onPress={() => navigateToChat(item.id)}
+              onPress={() => navigateToChat(item.id, profileData!)}
             >
               <Animated.View
                 entering={FadeIn}
@@ -269,16 +255,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
+    
   },
   name: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#333333',
-    flex: 1,
+    color: COLORS.primary,
+    flex: 1,   
+    paddingLeft: 15,
+
   },
   profileImageContainer: {
-    width: 70,
-    height: 70,
+    width: 50,
+    height: 50,
     borderRadius: 35,
     borderWidth: 2,
     borderColor: '#FFF',
