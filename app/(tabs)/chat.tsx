@@ -9,30 +9,24 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { useDispatch, useSelector } from 'react-redux';
-import { Href, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { RootState, AppDispatch } from '@/store';
-import { listenToUserChats } from '@/store/chatThunks';
+import { listenToUserChats } from '@/store/thunks/chatThunks';
 import { UserData } from '@/assets/types/types';
-import useUserProfileData from '@/hooks/useUserProfileData';
 import SkeletonLoadingChatItem  from '@/components/SkeletonLoadingItem';
 import { COLORS } from '@/constants/Colors';
+import { Header } from '@/components/Header';
+
 
 const ChatScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
-  // Getting user data using custom hook
-  const {
-    user,
-    profileData,
-    loading: userLoading,
-    userError: userError,
-    refetch: refetchUser,
-  } = useUserProfileData();
+  const { profileData, loading: userLoading, userError, user } = useSelector((state: RootState) => state.user);
+
 
   // Getting chat data from Redux
   const { chats, loading: chatsLoading, error: chatsError } = useSelector(
@@ -64,19 +58,19 @@ const ChatScreen: React.FC = () => {
   }, [dispatch, user, userLoading, router]);
 
   // the retry refresh mechanism
-  const handleRetry = useCallback(() => {
-    setRefreshing(true);
-    try {
-      refetchUser();
-      if (user) {
-        dispatch(listenToUserChats(user.uid));
-      }
-    } catch (error) {
-      console.error('Retry failed:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refetchUser, dispatch, user]);
+  // const handleRetry = useCallback(() => {
+  //   setRefreshing(true);
+  //   try {
+  //     refetchUser();
+  //     if (user) {
+  //       dispatch(listenToUserChats(user.uid));
+  //     }
+  //   } catch (error) {
+  //     console.error('Retry failed:', error);
+  //   } finally {
+  //     setRefreshing(false);
+  //   }
+  // }, [refetchUser, dispatch, user]);
 
   // Function to navigate to [chat by id]
   const navigateToChat = useCallback(
@@ -137,7 +131,7 @@ const ChatScreen: React.FC = () => {
         <Text style={styles.errorMessage}>
           {error || 'Unable to load data'}
         </Text>
-        <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+        <TouchableOpacity style={styles.retryButton}>
           <Text style={styles.retryButtonText}>Try Again</Text>
         </TouchableOpacity>
       </View>
@@ -153,27 +147,7 @@ const ChatScreen: React.FC = () => {
       style={styles.container}
     >
       {/* Header */}
-      <LinearGradient
-        colors={['#FFF4E0', '#FFEBC6']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.headerContent}>
-          <Text style={styles.name}>{profileData?.name}</Text>
-          <TouchableOpacity style={styles.profileImageContainer}>
-            {profileData?.avatar ? (
-              <Image
-                source={{ uri: profileData.avatar }}
-                style={styles.profileImage}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.placeholderAvatar} />
-            )}
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
+      < Header />
 
       {/* Recent Chats */}
       <View style={styles.recentChatsContainer}>
@@ -186,7 +160,7 @@ const ChatScreen: React.FC = () => {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={handleRetry}
+              // onRefresh={handleRetry}
               colors={['#FF9800', '#F57C00']}
               tintColor="#FF9800"
             />
@@ -413,239 +387,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   }
 });
-
-
-
-
-
-
-// import React, { useState, useCallback } from 'react';
-// import { 
-//   View, 
-//   Text, 
-//   Image, 
-//   TouchableOpacity, 
-//   StyleSheet, 
-//   FlatList, 
-//   ActivityIndicator, 
-//   RefreshControl 
-// } from 'react-native';
-// import { LinearGradient } from 'expo-linear-gradient';
-// import Animated, { 
-//   FadeIn, 
-//   FadeOut, 
-//   Layout 
-// } from 'react-native-reanimated';
-// import useUserProfileData from '@/hooks/useUserProfileData';
-// import useUserChatFetcher from '@/hooks/useChatDataFetcher';
-// import { Href, router } from 'expo-router';
-
-// // Loading Skeleton with more refined design
-// const SkeletonChatItem = () => (
-//   <View style={styles.chatItem}>
-//     <LinearGradient
-//       colors={['#F5F5F5', '#FFFFFF', '#F5F5F5']}
-//       style={styles.skeletonAvatar}
-//       start={{ x: 0, y: 0 }}
-//       end={{ x: 1, y: 0 }}
-//     />
-//     <View style={styles.chatInfo}>
-//       <LinearGradient
-//         colors={['#F0F0F0', '#FFFFFF', '#F0F0F0']}
-//         style={styles.skeletonTitle}
-//         start={{ x: 0, y: 0 }}
-//         end={{ x: 1, y: 0 }}
-//       />
-//       <LinearGradient
-//         colors={['#F0F0F0', '#FFFFFF', '#F0F0F0']}
-//         style={styles.skeletonSubtitle}
-//         start={{ x: 0, y: 0 }}
-//         end={{ x: 1, y: 0 }}
-//       />
-//     </View>
-//   </View>
-// );
-
-// const ChatScreen = () => {
-
-//   const [refreshing, setRefreshing] = useState(false);
-
-//   // Getting user data
-//   const {
-//     user, 
-//     profileData, 
-//     loading: userLoading, 
-//     userError: userError, 
-//     refetch: refetchUser 
-//   } = useUserProfileData();
-
-//   // Getting chat data
-//   const { 
-//     data, 
-//     loading: loadingChats, 
-//     error: errorChats, 
-//     refetch: refetchChats 
-//   } = useUserChatFetcher(user?.uid ?? null);
-
-//   // Combined retry mechanism
-//   const handleRetry = useCallback(async () => {
-//     setRefreshing(true);
-//     try {
-//       await Promise.all([refetchUser(), refetchChats()]);
-//     } catch (error) {
-//       console.error('Retry failed:', error);
-//     } finally {
-//       setRefreshing(false);
-//     }
-//   }, [refetchUser, refetchChats]);
-
-//   // Redirect to message screen
-//   const navigateToChat = useCallback((chatId: string) => {
-//     // Navigate to the specific chat screen
-//     // router.push(`/components/chatAndMessages/${chatId}` as Href<string | object>);  
-//     router.push(`/components/chatAndMessages/${chatId}` as Href<string | object>);
-
-//     }, []);
-
-
-//   // Redirect if no user
-//   React.useEffect(() => {
-//     if (!userLoading && !user) {
-//       router.push('/screens/LoginScreen');
-//     }
-//   }, [user, userLoading, router]);
-
-//   function formatLastUpdated(timestamp: number): string {
-//     try {
-//       const date = new Date(timestamp * 1000);
-//       const options: Intl.DateTimeFormatOptions = {
-//         year: '2-digit',
-//         month: 'short',
-//         day: 'numeric',
-//       };
-//       return date.toLocaleString('en-US', options);
-//     } catch (error) {
-//       return "Invalid timestamp";
-//     }
-//   }
-
-//   // Error handling
-//   if (userError || errorChats) {
-//     return (
-//       <View style={styles.errorContainer}>
-//         <Text style={styles.errorTitle}>Oops! Something went wrong</Text>
-//         <Text style={styles.errorMessage}>
-//           {userError || errorChats || 'Unable to load data'}
-//         </Text>
-//         <TouchableOpacity 
-//           style={styles.retryButton} 
-//           onPress={handleRetry}
-//         >
-//           <Text style={styles.retryButtonText}>Try Again</Text>
-//         </TouchableOpacity>
-//       </View>
-//     );
-//   }
-
-//   // Loading state
-//   if (userLoading || loadingChats) {
-//     return (
-//       <View style={styles.container}>
-//         <View style={styles.header}>
-//           <View style={styles.skeletonName} />
-//           <View style={styles.profileImageContainer} />
-//         </View>
-//         <View style={styles.recentChatsContainer}>
-//           <Text style={styles.recentChatsTitle}>Chats</Text>
-//           {[...Array(5)].map((_, index) => (
-//             <SkeletonChatItem key={index} />
-//           ))}
-//         </View>
-//       </View>
-//     );
-//   }
-
-
-//   return (
-//     <Animated.View 
-//       entering={FadeIn} 
-//       exiting={FadeOut} 
-//       layout={Layout}
-//       style={styles.container}
-//     >
-//       <LinearGradient
-//         colors={['#FFF4E0', '#FFEBC6']}
-//         style={styles.header}
-//         start={{ x: 0, y: 0 }}
-//         end={{ x: 1, y: 1 }}
-//       >
-//         <View style={styles.headerContent}>
-//           <Text style={styles.name}>
-//             {profileData?.name}
-//           </Text>
-//           <TouchableOpacity style={styles.profileImageContainer}>
-//             <Image 
-//               source={{ uri: profileData?.avatar }} 
-//               style={styles.profileImage} 
-//               resizeMode="cover"
-//             />
-//           </TouchableOpacity>
-//         </View>
-//       </LinearGradient>
-
-//       <View style={styles.recentChatsContainer}>
-//         <Text style={styles.recentChatsTitle}>Recent Chats</Text>
-        
-//         <FlatList
-//           data={data?.chats}
-//           keyExtractor={(item) => item.id}
-//           showsVerticalScrollIndicator={false}
-//           refreshControl={
-//             <RefreshControl
-//               refreshing={refreshing}
-//               onRefresh={handleRetry}
-//               colors={['#FF9800', '#F57C00']}
-//               tintColor="#FF9800"
-//             />
-//           }
-//           renderItem={({ item }) => (
-//             <TouchableOpacity
-//               onPress={() => navigateToChat(item.id)}
-//               >
-
-//               <Animated.View 
-//                 entering={FadeIn} 
-//                 layout={Layout}
-//                 style={styles.chatItem}
-//               >
-//                 <View style={styles.chatAvatarContainer}>
-//                   <Image 
-//                     source={{ uri: item.chatAvatar }} 
-//                     style={styles.chatAvatar} 
-//                     resizeMode="cover"
-//                   />
-//                 </View>
-//                 <View style={styles.chatInfo}>
-//                   <Text style={styles.chatName} numberOfLines={1}>
-//                     {item.chatName}
-//                   </Text>
-//                   <Text style={styles.chatMessage} numberOfLines={1}>
-//                     {item.lastMessage || 'No messages yet'}
-//                   </Text>
-//                 </View>
-//                 <Text style={styles.chatTime}>
-//                   {formatLastUpdated(item.lastUpdated)}
-//                 </Text>
-//               </Animated.View>
-
-//             </TouchableOpacity>
-
-//           )}
-//         />
-//       </View>
-//     </Animated.View>
-//   );
-// };
-
-// export default ChatScreen;
-

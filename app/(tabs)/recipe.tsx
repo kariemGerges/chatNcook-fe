@@ -7,16 +7,8 @@ import {RecipeCard} from '@/components/RecipeCard';
 import { Recipe } from '@/assets/types/types';
 import { router } from 'expo-router';
 import SkeletonLoadingItem from '@/components/SkeletonLoadingItem';
+import { Header } from '@/components/Header';
 
-// Memoized header component to prevent unnecessary re-renders
-const Header = memo(() => (
-    <ThemedView style={styles.header}>
-        <ThemedText style={styles.name}>Kariem Gerges</ThemedText>
-        <ThemedView style={styles.profileImageContainer}>
-            <ThemedView style={styles.profileImage} />
-        </ThemedView>
-    </ThemedView>
-));
 
 // Memoized section title component
 const SectionTitle = memo(() => (
@@ -121,30 +113,6 @@ export default function RecipeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        paddingTop: 35,
-        backgroundColor: '#FFEBC6',
-    },
-    name: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#000000',
-    },
-    profileImageContainer: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#E0E0E0',
-        marginLeft: 'auto',
-    },
-    profileImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
     },
     sectionTitle: {
         fontSize: 20,

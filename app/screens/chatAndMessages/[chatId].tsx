@@ -28,6 +28,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { firestore } from '@/firebaseConfig';
 import { collection, addDoc, serverTimestamp, Timestamp, FieldValue } from 'firebase/firestore';
 import { ChatItem } from './ChatItem';
+import { Header } from '@/components/Header'
 
 type ChatDetailRouteProp = RouteProp<{ params: { chatId: string } }, 'params'>;
 const { width, height } = Dimensions.get('window');
@@ -131,22 +132,6 @@ function formatLastUpdated(timestamp: number): string {
   }
 }
 
-// Header
-const Header = memo(({ userName, userAvatar, chatId }: { userName: string; userAvatar: string; chatId: string }) => (
-  
-  <View style={styles.header}>
-      <Text style={styles.name}>{userName}</Text>
-      <Text> chatid {chatId} </Text>
-        <View style={styles.profileImageContainer}>
-          <View style={styles.profileImage} >
-            <Image
-                source={{ uri: userAvatar }}
-                resizeMode="cover"
-          />
-      </View>
-    </View>
-  </View>
-));
 
 // if not text in message
 const NoMessage = memo(({ messages }: { messages: Message[]}) => (
@@ -163,9 +148,6 @@ const NoMessage = memo(({ messages }: { messages: Message[]}) => (
 ))
 
 const ChatDetailScreen = () => {
-
-  // const route = useRoute<ChatDetailRouteProp>();
-  // const { chatId } = route.params;
 
   const { 
     chatId, 
@@ -338,7 +320,7 @@ const ChatDetailScreen = () => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
       {/* header */}
-      <Header userName={userName} userAvatar={userAvatar} chatId={chatId} />
+      <Header />
       
       <StatusBar barStyle="dark-content" />
 

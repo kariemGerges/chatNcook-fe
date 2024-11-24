@@ -205,3 +205,10 @@ export interface ChatState {
   loading: boolean;
   error: string | null;
 }
+
+export interface UserState {
+  user: User | null;
+  profileData: UserData | null;
+  loading: boolean;
+  userError: string | null;
+}

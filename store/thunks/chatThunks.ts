@@ -1,12 +1,12 @@
-// src/store/chatThunks.ts
-import { AppDispatch } from './index';
+//chatThunks.ts
+import { AppDispatch } from '@/store/index';
 import {
   setChats,
   setMessages,
   setLoading,
   setError,
   clearChatData,
-} from './slices/chatSlice';
+} from '@/store/slices/chatSlice';
 import { firestore } from '@/firebaseConfig';
 import {
   onSnapshot,
