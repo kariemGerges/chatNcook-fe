@@ -24,3 +24,17 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+// Fall theme colors
+export const COLORS = {
+  primary: '#D35400', // Pumpkin Orange
+  secondary: '#784212', // Brown
+  background: '#FDF2E9', // Light Peach
+  accent: '#E67E22', // Carrot Orange
+  text: '#2C3E50', // Dark Blue Gray
+  lightText: '#7F8C8D', // Light Gray
+  success: '#27AE60', // Green for read status
+  loading: '#F39C12', // Yellow for sending status
+  sent: '#BDC3C7', // Gray for sent status
+};
+

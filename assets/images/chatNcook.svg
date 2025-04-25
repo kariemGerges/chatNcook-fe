@@ -1,0 +1,28 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="150" cy="150" r="140" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="2"/>
+  
+  <!-- Chat Bubble -->
+  <path d="M210 100 C260 100, 260 190, 210 190 L140 190 L120 220 L120 190 L90 190 C40 190, 40 100, 90 100 Z" 
+        fill="#FFE8D6" stroke="#FE724C" stroke-width="3" stroke-linejoin="round"/>
+  
+  <!-- Chef Hat -->
+  <path d="M150 115 C150 100, 165 100, 165 110 C175 95, 190 105, 180 115 L180 130 L130 130 L130 115 C120 105, 135 95, 150 110 Z" 
+        fill="#FFFFFF" stroke="#333333" stroke-width="2.5"/>
+  
+  <!-- Pot - now fully inside the chat bubble -->
+  <path d="M125 130 L185 130 L182 160 C182 165, 177 170, 172 170 L138 170 C133 170, 128 165, 128 160 Z" 
+        fill="#D4A373" stroke="#333333" stroke-width="2.5"/>
+  
+  <!-- Pot Handles -->
+  <path d="M125 140 C115 140, 115 150, 125 150" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M185 140 C195 140, 195 150, 185 150" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Steam -->
+  <path d="M140 120 C145 110, 135 105, 140 95" fill="none" stroke="#999999" stroke-width="2" stroke-linecap="round"/>
+  <path d="M155 115 C160 105, 150 100, 155 90" fill="none" stroke="#999999" stroke-width="2" stroke-linecap="round"/>
+  <path d="M170 120 C175 110, 165 105, 170 95" fill="none" stroke="#999999" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Text -->
+  <text x="150" y="240" font-family="Arial" font-size="28" font-weight="bold" text-anchor="middle" fill="#FE724C">ChatNCook</text>
+</svg>
