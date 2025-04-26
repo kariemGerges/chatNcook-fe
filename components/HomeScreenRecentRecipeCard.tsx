@@ -15,12 +15,13 @@ import { useCarouselRecipe } from '@/hooks/useCarouselRecipe';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoadingItem from './SkeletonLoadingItem';
 
-const { width } = Dimensions.get('window');
 
-export default function HomeScreenRecipeCard(toggleSaved: any) {
+export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
     const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
 
-    const renderTrendingRecipe = ({ item }: { item: Recipe }) => (
+    const displayedRecipes = recipe?.slice(0, 4);
+
+    const renderRecentRecipe = ({ item }: { item: Recipe }) => (
         <TouchableOpacity
             onPress={() =>
                 router.push({
@@ -28,55 +29,40 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
                     params: { recipeDetail: JSON.stringify(item) },
                 })
             }
-            style={styles.trendingCard}
+            style={styles.recentCard}
         >
             <Image
                 defaultSource={require('@/assets/images/sginup.webp')}
                 source={{ uri: item.image_url }}
-                style={styles.trendingImage}
+                style={styles.recentImage}
             />
-
+            <View style={styles.recentInfo}>
+                <Text style={styles.recentTitle} numberOfLines={1}>
+                    {item.title}
+                </Text>
+                <Text style={styles.recentChef} numberOfLines={1}>
+                    by {item.author}
+                </Text>
+                <View style={styles.recentStats}>
+                    <Text style={styles.recentTime}>
+                        {item.preparation_time}
+                    </Text>
+                    <View style={styles.recentLikes}>
+                        <Ionicons name="heart" size={12} color="#FF4B4B" />
+                        <Text style={styles.recentLikesText}>{item.likes}</Text>
+                    </View>
+                </View>
+            </View>
             <TouchableOpacity
-                style={styles.saveButton}
+                style={styles.recentSaveButton}
                 onPress={() => toggleSaved(item.id)}
             >
                 <Ionicons
                     name={item.saved ? 'bookmark' : 'bookmark-outline'}
-                    size={20}
-                    color={item.saved ? '#FE724C' : '#FFFFFF'}
+                    size={16}
+                    color={item.saved ? '#FE724C' : '#777777'}
                 />
             </TouchableOpacity>
-
-            <View style={styles.trendingInfo}>
-                <Text style={styles.trendingTitle}>{item.title}</Text>
-
-                <View style={styles.recipeDetails}>
-                    <View style={styles.chefContainer}>
-                        <Image
-                            source={{ uri: item.chefAvatar }}
-                            style={styles.chefAvatar}
-                        />
-                        <Text style={styles.chefName}>{item.author}</Text>
-                    </View>
-
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statItem}>
-                            <Ionicons
-                                name="time-outline"
-                                size={16}
-                                color="#555555"
-                            />
-                            <Text style={styles.statText}>
-                                {item.preparation_time}
-                            </Text>
-                        </View>
-                        <View style={styles.statItem}>
-                            <Ionicons name="heart" size={16} color="#FF4B4B" />
-                            <Text style={styles.statText}>{item.likes}</Text>
-                        </View>
-                    </View>
-                </View>
-            </View>
         </TouchableOpacity>
     );
 
@@ -108,14 +94,16 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
                         </TouchableOpacity>
                     </View>
 
-                    <FlatList
-                        data={recipe}
-                        renderItem={renderTrendingRecipe}
-                        keyExtractor={(item) => item._id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.trendingList}
-                    />
+                    <View style={styles.recentGrid}>
+                        {displayedRecipes.map((recipe) => (
+                            <View
+                                key={recipe.id}
+                                style={{ width: '48%', marginBottom: 16 }}
+                            >
+                                {renderRecentRecipe({ item: recipe })}
+                            </View>
+                        ))}
+                    </View>
                 </>
             )}
         </View>
@@ -142,76 +130,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#FE724C',
     },
-    trendingList: {
-        paddingHorizontal: 16,
-    },
-    trendingCard: {
-        width: width * 0.75,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        marginRight: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 3,
-        overflow: 'hidden',
-    },
-    trendingImage: {
-        width: '100%',
-        height: 150,
-        resizeMode: 'cover',
-    },
-    saveButton: {
-        position: 'absolute',
-        top: 12,
-        right: 12,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 8,
-        padding: 6,
-    },
-    trendingInfo: {
-        padding: 14,
-    },
-    trendingTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333333',
-        marginBottom: 8,
-    },
-    recipeDetails: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    chefContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    chefAvatar: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-    },
-    chefName: {
-        fontSize: 12,
-        color: '#777777',
-        marginLeft: 6,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 12,
-    },
-    statText: {
-        fontSize: 12,
-        color: '#777777',
-        marginLeft: 4,
-    },
+
     errorContainer: {
         padding: 40,
         alignItems: 'center',
@@ -219,5 +138,68 @@ const styles = StyleSheet.create({
     errorText: {
         color: '#DC3545',
         marginTop: 8,
+    },
+    recentCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+        overflow: 'hidden',
+        flex: 1,
+    },
+    recentImage: {
+        width: '100%',
+        height: 100,
+        resizeMode: 'cover',
+    },
+    recentInfo: {
+        padding: 10,
+    },
+    recentTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333333',
+    },
+    recentChef: {
+        fontSize: 11,
+        color: '#777777',
+        marginTop: 2,
+    },
+    recentStats: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 6,
+    },
+    recentTime: {
+        fontSize: 11,
+        color: '#777777',
+    },
+    recentLikes: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    recentLikesText: {
+        fontSize: 11,
+        color: '#777777',
+        marginLeft: 3,
+    },
+    recentSaveButton: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        borderRadius: 6,
+        padding: 4,
+    },
+    recentGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        marginBottom: 100,
     },
 });

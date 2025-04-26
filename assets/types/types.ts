@@ -15,7 +15,10 @@ export interface Recipe {
     author: string;
     tags: string[];
     category: string;
-  }
+    likes: number;
+    saved: boolean;
+    chefAvatar: string;
+}
   
   
   export interface CarouselProps {

@@ -34,110 +34,118 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 //   };
 
   return (
-    <Animated.View
-      style={[
-        styles.card,
-        {
-          transform: [{ scale: scaleValue }],
-        },
-      ]}
-    >
-      {/* Image Section */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: recipe.image_url }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <View style={styles.tagContainer}>
-          {recipe.tags.map((tag ) => (
-            <View key={tag} style={styles.tag}>
-              <Text style={styles.tagText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
-        <View style={styles.categoryContainer}>
-          <Text style={styles.categoryText}>{recipe.category}</Text>
-        </View>
-      </View>
-
-      {/* Content Section */}
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{recipe.title}</Text>
-          <View style={styles.authorContainer}>
-            <FontAwesome name="user" size={14} color="#666" />
-            <Text style={styles.authorText}>By {recipe.author}</Text>
-          </View>
-        </View>
-
-        <Text style={styles.description} numberOfLines={2}>
-          {recipe.description}
-        </Text>
-
-        {/* Recipe Info Grid */}
-        <View style={styles.infoGrid}>
-          <View style={styles.infoItem}>
-            <FontAwesome name="clock-o" size={20} color="#666" />
-            <View>
-              <Text style={styles.infoLabel}>Prep Time</Text>
-              <Text style={styles.infoValue}>{recipe.preparation_time}</Text>
-            </View>
-          </View>
-          
-          <View style={styles.infoItem}>
-            <FontAwesome name="globe" size={20} color="#666" />
-            <View>
-              <Text style={styles.infoLabel}>Origin</Text>
-              <Text style={styles.infoValue}>{recipe.country_of_origin}</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoItem}>
-            <FontAwesome name="list" size={20} color="#666" />
-            <View>
-              <Text style={styles.infoLabel}>Ingredients</Text>
-              <Text style={styles.infoValue}>{recipe.ingredients.length} items</Text>
-            </View>
-          </View>
-
-          <View style={styles.infoItem}>
-            <FontAwesome name="tag" size={20} color="#666" />
-            <View>
-              <Text style={styles.infoLabel}>Category</Text>
-              <Text style={styles.infoValue}>{recipe.category}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <View style={styles.actions}>
-
-            <Pressable
-              onPress={() => setIsLiked(!isLiked)}
-              style={styles.actionButton}
-            >
-              <FontAwesome
-                name={isLiked ? "heart" : "heart-o"}
-                size={24}
-                color={isLiked ? "#FF4444" : "#666"}
+      <Animated.View
+          style={[
+              styles.card,
+              {
+                  transform: [{ scale: scaleValue }],
+              },
+          ]}
+      >
+          {/* Image Section */}
+          <View style={styles.imageContainer}>
+              <Image
+                  defaultSource={require('@/assets/images/sginup.webp')}
+                  source={{ uri: recipe.image_url }}
+                  style={styles.image}
+                  resizeMode="cover"
               />
-            </Pressable>
-
-            <Pressable
-              onPress={() => setIsSaved(!isSaved)}
-              style={styles.actionButton}
-            >
-              <FontAwesome
-                name={isSaved ? "bookmark" : "bookmark-o"}
-                size={24}
-                color={isSaved ? "#4444FF" : "#666"}
-              />
-            </Pressable>
+              <View style={styles.tagContainer}>
+                  {recipe.tags.map((tag) => (
+                      <View key={tag} style={styles.tag}>
+                          <Text style={styles.tagText}>{tag}</Text>
+                      </View>
+                  ))}
+              </View>
+              <View style={styles.categoryContainer}>
+                  <Text style={styles.categoryText}>{recipe.category}</Text>
+              </View>
           </View>
 
-          {/* <Pressable
+          {/* Content Section */}
+          <View style={styles.content}>
+              <View style={styles.header}>
+                  <Text style={styles.title}>{recipe.title}</Text>
+                  <View style={styles.authorContainer}>
+                      <FontAwesome name="user" size={14} color="#666" />
+                      <Text style={styles.authorText}>By {recipe.author}</Text>
+                  </View>
+              </View>
+
+              <Text style={styles.description} numberOfLines={2}>
+                  {recipe.description}
+              </Text>
+
+              {/* Recipe Info Grid */}
+              <View style={styles.infoGrid}>
+                  <View style={styles.infoItem}>
+                      <FontAwesome name="clock-o" size={20} color="#666" />
+                      <View>
+                          <Text style={styles.infoLabel}>Prep Time</Text>
+                          <Text style={styles.infoValue}>
+                              {recipe.preparation_time}
+                          </Text>
+                      </View>
+                  </View>
+
+                  <View style={styles.infoItem}>
+                      <FontAwesome name="globe" size={20} color="#666" />
+                      <View>
+                          <Text style={styles.infoLabel}>Origin</Text>
+                          <Text style={styles.infoValue}>
+                              {recipe.country_of_origin}
+                          </Text>
+                      </View>
+                  </View>
+
+                  <View style={styles.infoItem}>
+                      <FontAwesome name="list" size={20} color="#666" />
+                      <View>
+                          <Text style={styles.infoLabel}>Ingredients</Text>
+                          <Text style={styles.infoValue}>
+                              {recipe.ingredients.length} items
+                          </Text>
+                      </View>
+                  </View>
+
+                  <View style={styles.infoItem}>
+                      <FontAwesome name="tag" size={20} color="#666" />
+                      <View>
+                          <Text style={styles.infoLabel}>Category</Text>
+                          <Text style={styles.infoValue}>
+                              {recipe.category}
+                          </Text>
+                      </View>
+                  </View>
+              </View>
+
+              {/* Footer */}
+              <View style={styles.footer}>
+                  <View style={styles.actions}>
+                      <Pressable
+                          onPress={() => setIsLiked(!isLiked)}
+                          style={styles.actionButton}
+                      >
+                          <FontAwesome
+                              name={isLiked ? 'heart' : 'heart-o'}
+                              size={24}
+                              color={isLiked ? '#FF4444' : '#666'}
+                          />
+                      </Pressable>
+
+                      <Pressable
+                          onPress={() => setIsSaved(!isSaved)}
+                          style={styles.actionButton}
+                      >
+                          <FontAwesome
+                              name={isSaved ? 'bookmark' : 'bookmark-o'}
+                              size={24}
+                              color={isSaved ? '#4444FF' : '#666'}
+                          />
+                      </Pressable>
+                  </View>
+
+                  {/* <Pressable
             style={styles.viewButton}
             onPress={handleViewRecipe}
             onPressIn={handlePressIn}
@@ -145,9 +153,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           >
             <Text style={styles.viewButtonText}>View Recipe</Text>
           </Pressable> */}
-        </View>
-      </View>
-    </Animated.View>
+              </View>
+          </View>
+      </Animated.View>
   );
 };
 
