@@ -47,10 +47,12 @@ export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
                     <Text style={styles.recentTime}>
                         {item.preparation_time}
                     </Text>
-                    <View style={styles.recentLikes}>
+                    {/* <View style={styles.recentLikes}>
                         <Ionicons name="heart" size={12} color="#FF4B4B" />
-                        <Text style={styles.recentLikesText}>{item.likes}</Text>
-                    </View>
+                        <Text style={styles.recentLikesText}>
+                            {item.likes ? item.likes : 1158}
+                        </Text>
+                    </View> */}
                 </View>
             </View>
             <TouchableOpacity
@@ -82,7 +84,7 @@ export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
             {!recipeLoading && !error && (
                 <>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Trending Now</Text>
+                        <Text style={styles.sectionTitle}>Recently add </Text>
                         <TouchableOpacity
                             onPress={() =>
                                 router.push({

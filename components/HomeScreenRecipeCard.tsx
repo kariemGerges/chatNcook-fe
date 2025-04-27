@@ -14,10 +14,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCarouselRecipe } from '@/hooks/useCarouselRecipe';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoadingItem from './SkeletonLoadingItem';
+import { TrendingUp } from 'lucide-react';
 
 const { width } = Dimensions.get('window');
 
-export default function HomeScreenRecipeCard(toggleSaved: any) {
+interface Props {
+    toggleSaved: (id: string) => void;
+}
+
+export default function HomeScreenRecipeCard({toggleSaved}: Props) {
+    // Fetching trending recipes
     const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
 
     const renderTrendingRecipe = ({ item }: { item: Recipe }) => (
@@ -38,7 +44,7 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
 
             <TouchableOpacity
                 style={styles.saveButton}
-                onPress={() => toggleSaved(item.id)}
+                onPress={() => toggleSaved(item.id.toString())}
             >
                 <Ionicons
                     name={item.saved ? 'bookmark' : 'bookmark-outline'}
@@ -53,6 +59,7 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
                 <View style={styles.recipeDetails}>
                     <View style={styles.chefContainer}>
                         <Image
+                            defaultSource={require('@/assets/images/chef1.webp')}
                             source={{ uri: item.chefAvatar }}
                             style={styles.chefAvatar}
                         />
@@ -72,7 +79,7 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
                         </View>
                         <View style={styles.statItem}>
                             <Ionicons name="heart" size={16} color="#FF4B4B" />
-                            <Text style={styles.statText}>{item.likes}</Text>
+                            <Text style={styles.statText}>{item.likes? item.likes : 1158}</Text>
                         </View>
                     </View>
                 </View>
@@ -96,7 +103,9 @@ export default function HomeScreenRecipeCard(toggleSaved: any) {
             {!recipeLoading && !error && (
                 <>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Trending Now</Text>
+                        <Text style={styles.sectionTitle}>
+                            Trending Now 🔥 <TrendingUp />{' '}
+                        </Text>
                         <TouchableOpacity
                             onPress={() =>
                                 router.push({
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 12,
         right: 12,
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(3, 2, 0, 0.3)',
         borderRadius: 8,
         padding: 6,
     },

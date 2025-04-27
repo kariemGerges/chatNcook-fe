@@ -2,7 +2,7 @@
 import { View, Text, Image, ScrollView, StyleSheet, Share, Pressable, Dimensions, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { memo, useEffect, useState } from 'react';
-import { Recipe, mockRecipes } from '@/assets/types/types';
+import { Recipe } from '@/assets/types/types';
 import Animated, { 
   FadeInDown, 
   FadeIn, 

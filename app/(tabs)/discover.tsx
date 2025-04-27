@@ -6,18 +6,39 @@ import {
     ActivityIndicator,
     Alert,
     TouchableOpacity,
+    TextInput,
 } from 'react-native';
 import React, { memo, useCallback, useMemo } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+
 import useRecipeScreenFetcher from '@/hooks/useRecipeScreenFetcher';
 import { RecipeCard } from '@/components/RecipeCard';
 import { Recipe } from '@/assets/types/types';
 import { router } from 'expo-router';
 import SkeletonLoadingItem from '@/components/SkeletonLoadingItem';
+import DiscoverScreenCategories from '@/components/DiscoverScreenCategories';
 import { Header } from '@/components/Header';
 
 // Memoized section title component
 const SectionTitle = memo(() => (
-    <Text style={styles.sectionTitle}>Recipes</Text>
+    <View style={{ paddingBottom: 12 }}>
+        <Text style={styles.sectionTitle}></Text>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+            <View style={styles.searchBar}>
+                <Ionicons name="search" size={20} color="#777777" />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search recipes, chats..."
+                    placeholderTextColor="#999999"
+                />
+            </View>
+            <TouchableOpacity style={styles.filterButton}>
+                <Ionicons name="options-outline" size={20} color="#333333" />
+            </TouchableOpacity>
+        </View>
+        <DiscoverScreenCategories />
+    </View>
 ));
 
 // Memoized loading indicator component
@@ -90,6 +111,8 @@ export default function RecipeScreen() {
     return (
         <View style={styles.container}>
             <Header />
+
+            {/* Section Title */}
             <SectionTitle />
 
             <View style={styles.listContainer}>
@@ -128,14 +151,52 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     sectionTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-        padding: 16,
+        padding: 8,
+        color: '#333333',
     },
     listContainer: {
         flex: 1,
     },
     flatListContent: {
         paddingHorizontal: 16,
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 16,
+    },
+    searchBar: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 8,
+        fontSize: 15,
+        color: '#333333',
+    },
+    filterButton: {
+        padding: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        marginLeft: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
 });

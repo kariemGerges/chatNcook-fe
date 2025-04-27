@@ -1,5 +1,10 @@
 import { Chats } from '@/assets/types/types';
-import { MaterialIcons } from '@expo/vector-icons';
+import {
+    Ionicons,
+    MaterialCommunityIcons,
+    MaterialIcons,
+} from '@expo/vector-icons';
+
 import { useRef, useEffect } from 'react';
 import {
     Animated,
@@ -9,6 +14,7 @@ import {
     ActivityIndicator,
     View,
     Text,
+    Dimensions,
 } from 'react-native';
 
 import { useRouter } from 'expo-router';
@@ -17,6 +23,8 @@ import { listenToUserChats } from '@/store/thunks/chatThunks';
 import { selectRecentChatsVM } from '@/store/selectors/chatSelector';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreenRecentChats() {
     const dispatch = useDispatch<AppDispatch>();
@@ -76,6 +84,14 @@ export default function HomeScreenRecentChats() {
         }
     }
 
+    // Function to trim the last message to 20 characters
+    function trimLastMessage(message: string): string {
+        if (message.length > 20) {
+            return message.substring(0, 20) + '...';
+        }
+        return message;
+    }
+
     // kick off Entrance animation on mount
     useEffect(() => {
         Animated.parallel([
@@ -116,11 +132,11 @@ export default function HomeScreenRecentChats() {
                 onPress={() =>
                     router.push(`/screens/chatAndMessages/${item.id}`)
                 }
-                style={styles.chatItemContainer}
+                style={styles.chatCard}
                 activeOpacity={0.7}
             >
                 <View style={styles.chatItem}>
-                    <View style={styles.avatarContainer}>
+                    <View style={styles.chatIconContainer}>
                         <Image
                             source={
                                 item.chatAvatar
@@ -133,14 +149,18 @@ export default function HomeScreenRecentChats() {
                     </View>
                     <View style={styles.chatInfo}>
                         <Text style={styles.chatName}>{item.chatName}</Text>
-                        <View style={styles.messageContainer}>
+                        <View style={styles.chatDetails}>
                             <MaterialIcons
                                 name="chat-bubble-outline"
                                 size={12}
                                 color="#666"
                             />
                             <Text style={styles.chatMessage}>
-                                {item.lastMessage}
+                                {trimLastMessage(
+                                    item.lastMessage
+                                        ? item.lastMessage
+                                        : 'No messages yet'
+                                )}
                             </Text>
                         </View>
                     </View>
@@ -180,21 +200,31 @@ export default function HomeScreenRecentChats() {
     }
 
     return (
-        <Animated.FlatList
-            data={recent}
-            keyExtractor={(item) => item.id}
-            ListEmptyComponent={
-                <Text style={styles.noChatsText}>No chats available</Text>
-            }
-            renderItem={renderChatItem}
-            style={styles.container}
-            contentContainerStyle={styles.contentContainer}
-            onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: false }
-            )}
-            scrollEventThrottle={16}
-        />
+        <>
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Recent Chats</Text>
+                <TouchableOpacity>
+                    <Text style={styles.seeAllText}>See all</Text>
+                </TouchableOpacity>
+            </View>
+            <Animated.FlatList
+                data={recent}
+                keyExtractor={(item) => item.id}
+                ListEmptyComponent={
+                    <Text style={styles.noChatsText}>No chats available</Text>
+                }
+                renderItem={renderChatItem}
+                // style={styles.container}
+                contentContainerStyle={styles.chatsList}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: false }
+                )}
+                scrollEventThrottle={16}
+                showsVerticalScrollIndicator={false}
+                horizontal
+            />
+        </>
     );
 }
 
@@ -223,6 +253,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#5C4033',
     },
+    chatsList: {
+        paddingHorizontal: 16,
+    },
     seeAllButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -249,8 +282,14 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 12,
     },
-    avatarContainer: {
-        position: 'relative',
+    chatIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: '#FE724C',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
     },
     chatAvatar: {
         width: 40,
@@ -269,16 +308,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: '#FFF',
     },
-    chatInfo: {
-        flex: 1,
-        marginLeft: 12,
-    },
-    chatName: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#5C4033',
-        marginBottom: 4,
-    },
+
     messageContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -303,5 +333,67 @@ const styles = StyleSheet.create({
         color: '#666666',
         textAlign: 'center',
         marginTop: 20,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 12,
+        marginTop: 20,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333333',
+        paddingHorizontal: 16,
+        // marginBottom: 12,
+    },
+    chatCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 12,
+        marginRight: 16,
+        width: width * 0.75,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    chatInfo: {
+        flex: 1,
+    },
+    chatName: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#333333',
+        marginBottom: 4,
+    },
+    chatDetails: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    chatMembers: {
+        fontSize: 12,
+        color: '#777777',
+        marginRight: 12,
+    },
+    activeIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    activeDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#4CAF50',
+        marginRight: 4,
+    },
+    activeText: {
+        fontSize: 12,
+        color: '#4CAF50',
     },
 });
