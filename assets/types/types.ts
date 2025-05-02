@@ -45,6 +45,18 @@ export interface Recipe {
     refresh: () => void;
   }
 
+
+
+    export type apiResponseRecipeById = {
+        recipes: Recipe[];
+        loading: boolean;
+        error: string | null;
+        refreshing: boolean;
+        refresh: () => void;
+    };
+
+
+
   // recipe card type
   export interface RecipeCardProps {
     recipe: Recipe;

@@ -200,7 +200,7 @@ export default function HomeScreenRecentChats() {
     }
 
     return (
-        <>
+        <View>
             <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Recent Chats</Text>
                 <TouchableOpacity>
@@ -224,7 +224,7 @@ export default function HomeScreenRecentChats() {
                 showsVerticalScrollIndicator={false}
                 horizontal
             />
-        </>
+        </View>
     );
 }
 
@@ -341,6 +341,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginBottom: 12,
         marginTop: 20,
+    
     },
     sectionTitle: {
         fontSize: 18,

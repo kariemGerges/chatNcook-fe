@@ -15,6 +15,7 @@ import { Header } from '@/components/Header';
 import HomeScreenRecipeCard from '@/components/HomeScreenRecipeCard';
 import HomeScreenRecentRecipeCard from '@/components/HomeScreenRecentRecipeCard';
 import HomeScreenRecentChats from '@/components/HomeScreenRecentChats';
+import { AiFab } from '@/components/AiFab';
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +36,7 @@ export default function HomeScreen() {
             }
 
             const userId = currentUser.uid;
+            
             const savedRecipeRef = doc(
                 firestore,
                 'users',
@@ -84,6 +86,7 @@ export default function HomeScreen() {
 
                 {/* Recent Recipes */}
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSaved} />
+                <AiFab />
             </ScrollView>
         </SafeAreaView>
     );

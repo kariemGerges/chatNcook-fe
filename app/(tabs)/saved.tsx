@@ -13,35 +13,17 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-    collection,
-    query,
-    where,
-    getDocs,
-    doc,
-    updateDoc,
-    deleteDoc,
-} from 'firebase/firestore';
-import { firestore, auth } from '@/firebaseConfig'; // Import your Firebase config
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { firestore, auth } from '@/firebaseConfig';
 import { useRouter } from 'expo-router';
-
-// Define Recipe type
-interface Recipe {
-    id: string;
-    title: string;
-    author: string;
-    authorId: string;
-    prepTime: string;
-    image: string;
-    bookmarked: boolean;
-    description: string;
-    tags: string[];
-    createdAt: any; // Timestamp
-}
+import useFetchRecipeById from '@/hooks/useFetchRecipeById';
+import { Recipe } from '@/assets/types/types';
 
 export default function SavedRecipesScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const [isInitialFetch, setIsInitialFetch] = useState(true);
+
     const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState('All');
@@ -51,6 +33,21 @@ export default function SavedRecipesScreen() {
     const filters = ['All', 'Italian', 'Quick', 'Vegetarian', 'Recent'];
 
     // Fetch saved recipes from Firestore
+    const [recipeIds, setRecipeIds] = useState<number[]>([]);
+    const {
+        recipes,
+        loading: recipeLoading,
+        error: recipeError,
+        refreshing,
+        refresh,
+    } = useFetchRecipeById(isInitialFetch ? [] : recipeIds);
+
+    console.log('recipeIds:', recipeIds);
+    console.log('recipes from saved:', recipes);
+    console.log('recipeLoading:', recipeLoading, 'refreshing:', refreshing);
+    console.log('recipeError:', recipeError);
+
+    // First useEffect to fetch saved recipe IDs
     useEffect(() => {
         const fetchSavedRecipes = async () => {
             try {
@@ -64,39 +61,20 @@ export default function SavedRecipesScreen() {
                 }
 
                 const userId = currentUser.uid;
-
-                // Query saved recipes collection for the current user
                 const savedRef = collection(
                     firestore,
                     'users',
                     userId,
                     'savedRecipes'
                 );
+
                 const savedSnap = await getDocs(savedRef);
+                const newRecipeIds = savedSnap.docs.map((doc) =>
+                    Number(doc.id)
+                );
 
-                const recipeIds = savedSnap.docs.map((doc) => doc.id);
-
-                if (recipeIds.length === 0) {
-                    setSavedRecipes([]);
-                    setLoading(false);
-                    return;
-                }
-
-                // Get all recipe details
-                const recipesRef = collection(firestore, 'recipes');
-                const q = query(recipesRef, where('__name__', 'in', recipeIds));
-                const recipesSnap = await getDocs(q);
-
-                const recipesData = recipesSnap.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    bookmarked: true, // Since these are saved recipes
-                })) as Recipe[];
-
-                // Sort by most recently saved
-                recipesData.sort((a, b) => b.createdAt - a.createdAt);
-
-                setSavedRecipes(recipesData);
+                setRecipeIds(newRecipeIds);
+                setIsInitialFetch(false);
             } catch (err) {
                 console.error('Error fetching saved recipes:', err);
                 setError('Failed to load saved recipes');
@@ -106,10 +84,10 @@ export default function SavedRecipesScreen() {
         };
 
         fetchSavedRecipes();
-    }, []);
+    }, [auth.currentUser?.uid]);
 
     // Remove recipe from saved collection
-    const unsaveRecipe = async (recipeId: string) => {
+    const unsaveRecipe = async (recipeId: number) => {
         try {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
@@ -120,7 +98,7 @@ export default function SavedRecipesScreen() {
                 'users',
                 userId,
                 'savedRecipes',
-                recipeId
+                recipeId.toString()
             );
 
             await deleteDoc(savedRecipeRef);
@@ -136,7 +114,7 @@ export default function SavedRecipesScreen() {
     };
 
     // Navigate to recipe details
-    const viewRecipeDetails = (recipeId: string) => {
+    const viewRecipeDetails = (recipeId: number) => {
         router.push({
             pathname: '/screens/singleRecipe',
             params: { recipeDetail: JSON.stringify(recipeId) },
@@ -145,14 +123,16 @@ export default function SavedRecipesScreen() {
 
     // Filter recipes based on active filter
     const getFilteredRecipes = () => {
-        if (activeFilter === 'All') return savedRecipes;
+        if (activeFilter === 'All') return recipes;
         if (activeFilter === 'Recent') {
-            return [...savedRecipes]
-                .sort((a, b) => b.createdAt - a.createdAt)
-                .slice(0, 5);
+            return (
+                [...recipes]
+                    // .sort((a, b) => b.createdAt - a.createdAt)
+                    .slice(0, 5)
+            );
         }
 
-        return savedRecipes.filter((recipe) => {
+        return recipes.filter((recipe) => {
             const lowerFilter = activeFilter.toLowerCase();
             return recipe.tags.includes(lowerFilter);
         });
@@ -166,8 +146,8 @@ export default function SavedRecipesScreen() {
         >
             <Image
                 source={
-                    item.image
-                        ? { uri: item.image }
+                    item.image_url
+                        ? { uri: item.image_url }
                         : require('@/assets/images/sginup.webp')
                 }
                 style={styles.recipeImage}
@@ -183,7 +163,9 @@ export default function SavedRecipesScreen() {
                 <View style={styles.recipeMetaContainer}>
                     <View style={styles.prepTimeContainer}>
                         <Ionicons name="time-outline" size={14} color="#666" />
-                        <Text style={styles.prepTime}>{item.prepTime}</Text>
+                        <Text style={styles.prepTime}>
+                            {item.preparation_time}
+                        </Text>
                     </View>
 
                     <View style={styles.tagContainer}>
@@ -229,7 +211,19 @@ export default function SavedRecipesScreen() {
     );
 
     // Show loading state
-    if (loading) {
+    if (loading || recipeLoading) {
+        return (
+            <SafeAreaView style={[styles.container, styles.centerContent]}>
+                <ActivityIndicator size="large" color="#FE724C" />
+                <Text style={styles.loadingText}>
+                    Loading your saved recipes...
+                </Text>
+            </SafeAreaView>
+        );
+    }
+
+    // Show loading state
+    if (loading || (recipeLoading && !isInitialFetch)) {
         return (
             <SafeAreaView style={[styles.container, styles.centerContent]}>
                 <ActivityIndicator size="large" color="#FE724C" />
@@ -288,11 +282,12 @@ export default function SavedRecipesScreen() {
             </View>
 
             {/* Recipe list */}
-            {getFilteredRecipes().length > 0 ? (
+            {recipes ? (
                 <FlatList
-                    data={getFilteredRecipes()}
+                    // data={getFilteredRecipes()}
+                    data={recipes}
                     renderItem={renderRecipeCard}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item._id}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.recipeList}
                 />

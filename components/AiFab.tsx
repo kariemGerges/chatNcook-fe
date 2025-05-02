@@ -3,6 +3,10 @@ import { Animated, Pressable, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
+declare global {
+    var askSheet: { present: () => void } | undefined;
+}
+
 interface Props {
     announce?: boolean;
 }

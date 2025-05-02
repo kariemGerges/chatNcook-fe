@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
     Image,
     StyleSheet,
@@ -8,13 +9,21 @@ import {
     FlatList,
 } from 'react-native';
 import { router } from 'expo-router';
-
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc,
+} from 'firebase/firestore';
 import { Recipe } from '@/assets/types/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useCarouselRecipe } from '@/hooks/useCarouselRecipe';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoadingItem from './SkeletonLoadingItem';
-import { TrendingUp } from 'lucide-react';
+import { firestore, auth } from '@/firebaseConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -22,9 +31,26 @@ interface Props {
     toggleSaved: (id: string) => void;
 }
 
-export default function HomeScreenRecipeCard({toggleSaved}: Props) {
+export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
     // Fetching trending recipes
     const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
+    const [isSaved, setIsSaved] = useState<number[]>([]);
+
+    const currentUser = auth.currentUser;
+    const userId = currentUser?.uid;
+    const savedRef = userId
+        ? collection(firestore, 'users', userId, 'savedRecipes')
+        : null;
+
+    useEffect(() => {
+        const fetchSavedRecipes = async () => {
+            if (savedRef) {
+                const savedSnap = await getDocs(savedRef);
+                setIsSaved(savedSnap.docs.map((doc) => Number(doc.id)));
+            }
+        };
+        fetchSavedRecipes();
+    }, [savedRef]);
 
     const renderTrendingRecipe = ({ item }: { item: Recipe }) => (
         <TouchableOpacity
@@ -47,9 +73,11 @@ export default function HomeScreenRecipeCard({toggleSaved}: Props) {
                 onPress={() => toggleSaved(item.id.toString())}
             >
                 <Ionicons
-                    name={item.saved ? 'bookmark' : 'bookmark-outline'}
+                    name={
+                        isSaved.includes(Number(item.id)) ? 'bookmark' : 'bookmark-outline'
+                    }
                     size={20}
-                    color={item.saved ? '#FE724C' : '#FFFFFF'}
+                    color={isSaved.includes(Number(item.id)) ? '#FE724C' : '#FFFFFF'}
                 />
             </TouchableOpacity>
 
@@ -79,7 +107,9 @@ export default function HomeScreenRecipeCard({toggleSaved}: Props) {
                         </View>
                         <View style={styles.statItem}>
                             <Ionicons name="heart" size={16} color="#FF4B4B" />
-                            <Text style={styles.statText}>{item.likes? item.likes : 1158}</Text>
+                            <Text style={styles.statText}>
+                                {item.likes ? item.likes : 1158}
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -103,9 +133,7 @@ export default function HomeScreenRecipeCard({toggleSaved}: Props) {
             {!recipeLoading && !error && (
                 <>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>
-                            Trending Now 🔥 <TrendingUp />{' '}
-                        </Text>
+                        <Text style={styles.sectionTitle}>Trending Now 🔥</Text>
                         <TouchableOpacity
                             onPress={() =>
                                 router.push({
