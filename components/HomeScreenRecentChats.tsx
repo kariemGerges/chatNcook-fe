@@ -117,6 +117,7 @@ export default function HomeScreenRecentChats() {
     }) => (
         <Animated.View
             style={{
+                margin: 10,
                 opacity: fadeAnim,
                 transform: [
                     {

@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         marginBottom: 12,
-        marginTop: 20,
+        marginTop: 12,
     },
     sectionTitle: {
         fontSize: 18,
@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 3,
         overflow: 'hidden',
+        marginBottom: 2,
     },
     trendingImage: {
         width: '100%',
