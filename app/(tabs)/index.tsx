@@ -88,6 +88,7 @@ export default function HomeScreen() {
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSaved} />
                 <AiFab />
             </ScrollView>
+            
         </SafeAreaView>
     );
 }

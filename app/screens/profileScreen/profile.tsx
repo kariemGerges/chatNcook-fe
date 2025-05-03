@@ -53,7 +53,7 @@ const defaultProfileData: ProfileData = {
     uid: '',
 };
 
-const MobileProfile = () => {
+const MobileProfile: React.FC = () => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const [isEditing, setIsEditing] = useState(false);
     const [validationErrors, setValidationErrors] = useState<ValidationErrors>(

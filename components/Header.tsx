@@ -5,7 +5,6 @@ import {
     Image,
     StyleSheet,
     TouchableOpacity,
-    Animated,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -127,8 +126,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 20,
-        paddingTop: 40,
-        // paddingHorizontal: 20,
+        paddingTop: 50,
+        paddingBottom: 24,
     },
     leftSection: {
         flex: 1,
@@ -139,15 +138,22 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     greeting: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'helvetica',
+        color: 'rgba(255, 255, 255, 0.9)',
+        letterSpacing: 0.2,
         marginBottom: 4,
     },
     name: {
-        paddingTop: 4,
-        fontSize: 20,
+        paddingTop: 2,
+        fontSize: 22,
         fontWeight: '700',
         fontFamily: 'helvetica',
+        color: '#FFFFFF',
+        letterSpacing: 0.3,
+        textShadowColor: 'rgba(0, 0, 0, 0.1)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     notificationButton: {
         position: 'relative',
@@ -161,6 +167,7 @@ const styles = StyleSheet.create({
         width: 18,
         height: 18,
         borderRadius: 9,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1,

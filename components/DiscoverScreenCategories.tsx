@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
-import { Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState, useRef } from 'react';
+import {
+    Text,
+    TouchableOpacity,
+    FlatList,
+    StyleSheet,
+    View,
+    TextInput,
+    Animated,
+} from 'react-native';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 interface Category {
     id: string;
@@ -17,6 +25,15 @@ const DiscoverScreenCategories: React.FC = () => {
         { id: '3', name: 'Desserts', icon: 'cake', active: false },
         { id: '4', name: 'Healthy', icon: 'leaf', active: false },
     ]);
+
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    const headerTranslateY = scrollY.interpolate({
+        inputRange: [0, 100], // distance over which the header will move
+        outputRange: [0, -100], // from fully visible to fully hidden
+        extrapolate: 'clamp',
+    });
+
     // Toggle active state for categories
     const toggleCategoryActive = (id: string) => {
         setCategories(
@@ -52,7 +69,27 @@ const DiscoverScreenCategories: React.FC = () => {
         </TouchableOpacity>
     );
     return (
-        <>
+        <Animated.View
+            style={{ transform: [{ translateY: headerTranslateY }] }}>
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <View style={styles.searchBar}>
+                    <Ionicons name="search" size={20} color="#777777" />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search recipes, chats..."
+                        placeholderTextColor="#999999"
+                    />
+                </View>
+                <TouchableOpacity style={styles.filterButton}>
+                    <Ionicons
+                        name="options-outline"
+                        size={20}
+                        color="#333333"
+                    />
+                </TouchableOpacity>
+            </View>
+
             {/* Categories */}
             <FlatList
                 data={categories}
@@ -62,7 +99,7 @@ const DiscoverScreenCategories: React.FC = () => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.categoriesList}
             />
-        </>
+        </Animated.View>
     );
 };
 
@@ -96,6 +133,44 @@ const styles = StyleSheet.create({
     },
     categoryButtonTextActive: {
         color: '#FFFFFF',
+    },
+
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 16,
+    },
+    searchBar: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 8,
+        fontSize: 15,
+        color: '#333333',
+    },
+    filterButton: {
+        padding: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        marginLeft: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
 });
 

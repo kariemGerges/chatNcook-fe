@@ -6,9 +6,7 @@ import {
     Image,
     TouchableOpacity,
     StyleSheet,
-    Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchFriends } from '@/store/thunks/friendThunks';
 import { selectFriends } from '@/store/selectors/friendSelectors';
@@ -46,15 +44,7 @@ const FriendsListScreen = () => {
     };
 
     const handleFriendPress = (friend: FriendProfile) => {
-        // Navigate to chat or user profile
-        // navigation.navigate('Chat', {
-        //     userId: friend.id,
-        //     name: friend.displayName,
-        // } as never);
-
-        // using router.push instead of navigation.navigate
         router.push(`/chat/${friend.id}` as never);
-        // router.push(`/screens/UserProfileScreen/${friend.id}` as never);
     };
 
     const navigateToChat = useCallback(
@@ -87,7 +77,9 @@ const FriendsListScreen = () => {
                 style={styles.avatar}
             />
             <View style={styles.friendInfo}>
-                <Text style={styles.friendName}>{item.displayName} {item.email }</Text>
+                <Text style={styles.friendName}>
+                    {item.displayName} {item.email}
+                </Text>
                 <Text style={styles.friendStatus}>
                     {item.status === 'online' ? 'Online' : 'Offline'}
                 </Text>
@@ -150,6 +142,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
+        marginTop: 42,
         backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
@@ -159,7 +152,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     searchButton: {
-        backgroundColor: '#0066cc',
+        backgroundColor: '#FF9966',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 16,
@@ -235,7 +228,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     findFriendsButton: {
-        backgroundColor: '#0066cc',
+        backgroundColor: '#FF9966',
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 8,

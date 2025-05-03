@@ -33,7 +33,13 @@ interface Props {
 
 export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
     // Fetching trending recipes
-    const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
+    const {
+        recipe,
+        loading: recipeLoading,
+        error,
+        refresh,
+        refreshing,
+    } = useCarouselRecipe();
     const [isSaved, setIsSaved] = useState<number[]>([]);
 
     const currentUser = auth.currentUser;
@@ -63,8 +69,12 @@ export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
             style={styles.trendingCard}
         >
             <Image
-                defaultSource={require('@/assets/images/sginup.webp')}
-                source={{ uri: item.image_url }}
+                // defaultSource={require('@/assets/images/sginup.webp')}
+                source={{
+                    uri: item.image_url
+                        ? item.image_url
+                        : require('@/assets/images/sginup.webp'),
+                }}
                 style={styles.trendingImage}
             />
 
@@ -74,10 +84,16 @@ export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
             >
                 <Ionicons
                     name={
-                        isSaved.includes(Number(item.id)) ? 'bookmark' : 'bookmark-outline'
+                        isSaved.includes(Number(item.id))
+                            ? 'bookmark'
+                            : 'bookmark-outline'
                     }
                     size={20}
-                    color={isSaved.includes(Number(item.id)) ? '#FE724C' : '#FFFFFF'}
+                    color={
+                        isSaved.includes(Number(item.id))
+                            ? '#FE724C'
+                            : '#FFFFFF'
+                    }
                 />
             </TouchableOpacity>
 
@@ -152,6 +168,8 @@ export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.trendingList}
+                        onRefresh={refresh}
+                        refreshing={refreshing}
                     />
                 </>
             )}

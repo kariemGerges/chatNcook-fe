@@ -11,7 +11,7 @@ import {
     StatusBar,
     ActivityIndicator,
     ScrollView,
-    RefreshControl
+    RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -43,11 +43,6 @@ export default function SavedRecipesScreen() {
         refreshing,
         refresh,
     } = useFetchRecipeById(isInitialFetch ? [] : recipeIds);
-
-    // console.log('recipeIds:', recipeIds);
-    // console.log('recipes from saved:', recipes);
-    // console.log('recipeLoading:', recipeLoading, 'refreshing:', refreshing);
-    // console.log('recipeError:', recipeError);
 
     // First useEffect to fetch saved recipe IDs
     useEffect(() => {
@@ -262,79 +257,94 @@ export default function SavedRecipesScreen() {
     }
 
     return (
-        // <ScrollView
-        //     refreshControl={
-        //         <RefreshControl refreshing={refreshing} onRefresh={refresh} />
-        //     }
-        // >
-            <SafeAreaView
-                style={[styles.container, { paddingTop: insets.top }]}
-            >
-                <StatusBar barStyle="dark-content" />
+        <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+            <StatusBar barStyle="dark-content" />
 
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Saved Recipes</Text>
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>Saved Recipes</Text>
 
-                    <TouchableOpacity>
-                        <Ionicons
-                            name="options-outline"
-                            size={24}
-                            color="#FE734D"
-                        />
+                <TouchableOpacity>
+                    <Ionicons
+                        name="options-outline"
+                        size={24}
+                        color="#FE734D"
+                    />
+                </TouchableOpacity>
+            </View>
+
+            {/* Filter chips */}
+            <View style={styles.filterContainer}>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={filters}
+                    renderItem={({ item }) => renderFilterChip(item)}
+                    keyExtractor={(item) => item}
+                    contentContainerStyle={styles.filterList}
+                    onRefresh={refresh}
+                    refreshing={refreshing}
+                />
+            </View>
+
+            {/* Recipe list */}
+            {recipes ? (
+                <FlatList
+                    // data={getFilteredRecipes()}
+                    data={recipes}
+                    renderItem={renderRecipeCard}
+                    keyExtractor={(item) => item._id}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.recipeList}
+                    onRefresh={refresh}
+                    refreshing={refreshing}
+                    ListEmptyComponent={
+                        <View style={styles.emptyStateContainer}>
+                            <Ionicons
+                                name="bookmark-outline"
+                                size={80}
+                                color="#CCCCCC"
+                            />
+                            <Text style={styles.emptyStateText}>
+                                No saved recipes found
+                            </Text>
+                            <Text style={styles.emptyStateSubtext}>
+                                Recipes you save will appear here
+                            </Text>
+                            <TouchableOpacity
+                                style={styles.discoverButton}
+                                onPress={() => router.push('/discover')}
+                            >
+                                <Text style={styles.discoverButtonText}>
+                                    Discover Recipes
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                />
+            ) : (
+                <View style={styles.emptyStateContainer}>
+                    <Ionicons
+                        name="bookmark-outline"
+                        size={80}
+                        color="#CCCCCC"
+                    />
+                    <Text style={styles.emptyStateText}>
+                        No saved recipes found
+                    </Text>
+                    <Text style={styles.emptyStateSubtext}>
+                        Recipes you save will appear here
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.discoverButton}
+                        onPress={() => router.push('/discover')}
+                    >
+                        <Text style={styles.discoverButtonText}>
+                            Discover Recipes
+                        </Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* Filter chips */}
-                <View style={styles.filterContainer}>
-                    <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={filters}
-                        renderItem={({ item }) => renderFilterChip(item)}
-                        keyExtractor={(item) => item}
-                        contentContainerStyle={styles.filterList}
-                        onRefresh={refresh}
-                        refreshing={refreshing}
-                    />
-                </View>
-
-                {/* Recipe list */}
-                {recipes ? (
-                    <FlatList
-                        // data={getFilteredRecipes()}
-                        data={recipes}
-                        renderItem={renderRecipeCard}
-                        keyExtractor={(item) => item._id}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={styles.recipeList}
-                        onRefresh={refresh}
-                        refreshing={refreshing}
-                    />
-                ) : (
-                    <View style={styles.emptyStateContainer}>
-                        <Ionicons
-                            name="bookmark-outline"
-                            size={80}
-                            color="#CCCCCC"
-                        />
-                        <Text style={styles.emptyStateText}>
-                            No saved recipes found
-                        </Text>
-                        <Text style={styles.emptyStateSubtext}>
-                            Recipes you save will appear here
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.discoverButton}
-                            onPress={() => router.push('/discover')}
-                        >
-                            <Text style={styles.discoverButtonText}>
-                                Discover Recipes
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </SafeAreaView>
-        // </ScrollView>
+            )}
+        </SafeAreaView>
     );
 }
 

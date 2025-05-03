@@ -275,6 +275,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f5f5',
         padding: 16,
+        paddingTop: 42,
     },
     searchContainer: {
         backgroundColor: '#fff',
@@ -317,8 +318,8 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     activeType: {
-        backgroundColor: '#e0e0ff',
-        borderColor: '#0066cc',
+        backgroundColor: '#FFBD31',
+        borderColor: '#000000',
         borderWidth: 1,
     },
     typeButtonText: {
@@ -327,7 +328,7 @@ const styles = StyleSheet.create({
     },
     searchButton: {
         height: 48,
-        backgroundColor: '#0066cc',
+        backgroundColor: '#FF9966',
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     addButton: {
-        backgroundColor: '#0066cc',
+        backgroundColor: '#FF9966',
     },
     cancelButton: {
         backgroundColor: '#ff6666',

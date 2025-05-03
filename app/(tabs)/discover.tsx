@@ -6,10 +6,9 @@ import {
     ActivityIndicator,
     Alert,
     TouchableOpacity,
-    TextInput,
+    Animated,
 } from 'react-native';
-import React, { memo, useCallback, useMemo } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import React, { memo, useCallback, useMemo, useRef, useEffect } from 'react';
 
 import useRecipeScreenFetcher from '@/hooks/useRecipeScreenFetcher';
 import { RecipeCard } from '@/components/RecipeCard';
@@ -23,20 +22,7 @@ import { Header } from '@/components/Header';
 const SectionTitle = memo(() => (
     <View style={{ paddingBottom: 12 }}>
         <Text style={styles.sectionTitle}></Text>
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-            <View style={styles.searchBar}>
-                <Ionicons name="search" size={20} color="#777777" />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search recipes, chats..."
-                    placeholderTextColor="#999999"
-                />
-            </View>
-            <TouchableOpacity style={styles.filterButton}>
-                <Ionicons name="options-outline" size={20} color="#333333" />
-            </TouchableOpacity>
-        </View>
+        {/* Search bar component */}
         <DiscoverScreenCategories />
     </View>
 ));
@@ -58,8 +44,16 @@ export default function RecipeScreen() {
     const { recipes, loading, error, refreshing, loadMore, refresh } =
         useRecipeScreenFetcher();
 
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    const headerTranslateY = scrollY.interpolate({
+        inputRange: [0, 100], // distance over which the header will move
+        outputRange: [0, -100], // from fully visible to fully hidden
+        extrapolate: 'clamp',
+    });
+
     // Error handling effect
-    React.useEffect(() => {
+    useEffect(() => {
         if (error) {
             Alert.alert('Error', error);
         }
@@ -167,36 +161,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         marginBottom: 16,
-    },
-    searchBar: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    searchInput: {
-        flex: 1,
-        marginLeft: 8,
-        fontSize: 15,
-        color: '#333333',
-    },
-    filterButton: {
-        padding: 10,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        marginLeft: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
     },
 });

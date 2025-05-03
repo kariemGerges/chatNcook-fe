@@ -24,7 +24,7 @@ const useRecipeScreenFetcher = (recipeIds: number[]): apiResponseRecipeById => {
                 const response = await axios.get(
                     `https://chatncook-be.onrender.com/recipes/ids?${query}`
                 );
-                console.log('Response data:', response.data);
+                // console.log('Response data:', response.data);
 
                 // Check if response.data has the expected structure
                 if (response.data && Array.isArray(response.data)) {
