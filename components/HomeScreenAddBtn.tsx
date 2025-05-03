@@ -28,12 +28,20 @@ if (Platform.OS === 'android') {
 interface ActionButtonProps {
     onNewChatPress: () => void;
     onNewRecipePress: () => void;
+    onNewFriendPress: () => void;
+    onHelpPress: () => void;
+    onSettingsPress: () => void;
+    onFavPress: () => void;
     onClose: () => void;
 }
 
 const WheelActionMenu = ({
     onNewChatPress,
     onNewRecipePress,
+    onNewFriendPress,
+    onHelpPress,
+    onSettingsPress,
+    onFavPress,
     onClose,
 }: ActionButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -134,28 +142,28 @@ const WheelActionMenu = ({
             iconProvider: Feather,
             color: '#4CAF50',
             label: 'Cookbook',
-            onPress: () => console.log('Cookbook'),
+            onPress: onNewFriendPress,
         },
         {
             icon: 'star',
             iconProvider: FontAwesome5,
             color: '#9C27B0',
             label: 'Favorites',
-            onPress: () => console.log('Favorites'),
+            onPress: onFavPress,
         },
         {
             icon: 'cog',
             iconProvider: FontAwesome5,
             color: '#607D8B',
             label: 'Settings',
-            onPress: () => console.log('Settings'),
+            onPress: onSettingsPress,
         },
         {
             icon: 'question-circle',
             iconProvider: FontAwesome5,
             color: '#2196F3',
             label: 'Help',
-            onPress: () => console.log('Help'),
+            onPress: onHelpPress,
         },
     ];
 
