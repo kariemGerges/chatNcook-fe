@@ -227,3 +227,28 @@ export interface FriendRequest {
         photoURL: string | null;
     };
 }
+
+export type RecipeCategory =
+    | 'Appetizer'
+    | 'Main Course'
+    | 'Dessert'
+    | 'Breakfast'
+    | 'Lunch'
+    | 'Dinner'
+    | 'Snack'
+    | 'Drink';
+
+export type RootStackParamList = {
+    Home: undefined;
+    AddNewRecipe: undefined;
+    RecipeDetails: { recipeId: number };
+};
+
+export type AddNewRecipeScreenNavigationProp = StackNavigationProp<
+    RootStackParamList,
+    'AddNewRecipe'
+>;
+
+export interface AddNewRecipeScreenProps {
+    navigation: AddNewRecipeScreenNavigationProp;
+}
