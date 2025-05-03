@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     ScrollView,
@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { firestore, auth } from '@/firebaseConfig';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import useFetchRecipeById from '@/hooks/useFetchRecipeById';
 
 // import components
 import { Header } from '@/components/Header';
@@ -22,21 +23,47 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
     const [isSaved, setIsSaved] = useState(false);
 
+    const [savedRecipes, setSavedRecipes] = useState<{
+        [key: string]: boolean;
+    }>({});
     const [error, setError] = useState<string | null>(null);
 
-    // Toggle saved state for recipes
+    // Check if recipe is saved on component mount
+    useEffect(() => {
+        const checkSavedStatus = async (recipeId: string) => {
+            try {
+                const currentUser = auth.currentUser;
+                if (!currentUser) return;
+
+                const savedRecipeRef = doc(
+                    firestore,
+                    'users',
+                    currentUser.uid,
+                    'savedRecipes',
+                    recipeId
+                );
+                const docSnap = await getDoc(savedRecipeRef);
+                setSavedRecipes((prev) => ({
+                    ...prev,
+                    [recipeId]: docSnap.exists(),
+                }));
+            } catch (err) {
+                console.error('Error checking saved status:', err);
+            }
+        };
+        checkSavedStatus('recipeId'); // Replace 'recipeId' with the actual recipe ID you want to check
+    }, []);
+
     const toggleSaved = async (recipeId: string) => {
         try {
             const currentUser = auth.currentUser;
 
             if (!currentUser) {
-                // Prompt user to login
                 router.push('/screens/LoginScreen');
                 return;
             }
 
             const userId = currentUser.uid;
-            
             const savedRecipeRef = doc(
                 firestore,
                 'users',
@@ -45,21 +72,32 @@ export default function HomeScreen() {
                 recipeId
             );
 
-            if (isSaved) {
-                // Unsave recipe
+            const isCurrentlySaved = savedRecipes[recipeId];
+
+            if (isCurrentlySaved) {
                 await deleteDoc(savedRecipeRef);
-                setIsSaved(false);
+                setSavedRecipes((prev) => ({
+                    ...prev,
+                    [recipeId]: false,
+                }));
             } else {
-                // Save recipe with timestamp
                 await setDoc(savedRecipeRef, {
                     savedAt: new Date(),
                 });
-                setIsSaved(true);
+                setSavedRecipes((prev) => ({
+                    ...prev,
+                    [recipeId]: true,
+                }));
             }
+
+            // Clear any existing errors
+            setError(null);
         } catch (err) {
             console.error('Error toggling save status:', err);
             setError(
-                isSaved ? 'Failed to unsave recipe' : 'Failed to save recipe'
+                savedRecipes[recipeId]
+                    ? 'Failed to unsave recipe'
+                    : 'Failed to save recipe'
             );
         }
     };
@@ -79,7 +117,8 @@ export default function HomeScreen() {
                 {/* Greeting */}
 
                 {/* Trending Recipes */}
-                <HomeScreenRecipeCard toggleSaved={toggleSaved} />
+                <HomeScreenRecipeCard toggleSaved={toggleSaved}
+                />
 
                 {/* Active Chats */}
                 <HomeScreenRecentChats />
@@ -88,7 +127,6 @@ export default function HomeScreen() {
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSaved} />
                 <AiFab />
             </ScrollView>
-            
         </SafeAreaView>
     );
 }

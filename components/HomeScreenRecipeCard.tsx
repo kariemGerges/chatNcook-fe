@@ -69,7 +69,7 @@ export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
             style={styles.trendingCard}
         >
             <Image
-                // defaultSource={require('@/assets/images/sginup.webp')}
+                defaultSource={require('@/assets/images/sginup.webp')}
                 source={{
                     uri: item.image_url
                         ? item.image_url
