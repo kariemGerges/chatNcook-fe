@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -10,6 +10,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     Image,
+    ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,23 +24,29 @@ import {
     RecipeCategory,
     AddNewRecipeScreenProps,
 } from '@/assets/types/types';
-// import { StackNavigationProp } from '@react-navigation/stack';
 
-const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
-    // State for all recipe fields
+const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = () => {
+    // Router and auth setup
     const router = useRouter();
+    const currentUser = auth.currentUser;
 
-    const [title, setTitle] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
-    const [imageUrl, setImageUrl] = useState<string>('');
-    const [ingredients, setIngredients] = useState<string>('');
-    const [preparationSteps, setPreparationSteps] = useState<string>('');
-    const [preparationTime, setPreparationTime] = useState<string>('');
-    const [countryOfOrigin, setCountryOfOrigin] = useState<string>('');
-    const [tags, setTags] = useState<string>('');
-    const [category, setCategory] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    // Recipe form state
+    const [recipeForm, setRecipeForm] = useState({
+        title: '',
+        description: '',
+        imageUrl: '',
+        ingredients: '',
+        preparationSteps: '',
+        preparationTime: '',
+        countryOfOrigin: '',
+        tags: '',
+        category: '',
+    });
+
+    // UI state
+    const [showCategories, setShowCategories] = useState(false);
+    const [authError, setAuthError] = useState<string | null>(null);
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
     // Categories for selection
     const categories: RecipeCategory[] = [
@@ -52,32 +59,74 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
         'Snack',
         'Drink',
     ];
-    const [showCategories, setShowCategories] = useState<boolean>(false);
 
-    // get user id from firebase auth
-    const currentUser = auth.currentUser;
+    // Custom hook for adding recipes
+    const {
+        loading: newRecipeLoading,
+        error: newRecipeError,
+        success,
+        addNewRecipe,
+    } = useAddNewRecipe();
 
-    if (!currentUser) {
-        setError('You must be logged in to view saved recipes');
-        setLoading(false);
-        return;
-    }
+    // Check authentication on mount
+    useEffect(() => {
+        if (!currentUser) {
+            setAuthError('You must be logged in to add recipes');
+        }
+    }, [currentUser]);
 
-    const userId = currentUser.uid;
+    // Handle form input changes
+    const handleInputChange = (field: string, value: string) => {
+        setRecipeForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+
+        // Clear error for this field if it exists
+        if (formErrors[field]) {
+            setFormErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
+                return newErrors;
+            });
+        }
+    };
+
+    // Select a category
+    const selectCategory = (selectedCategory: RecipeCategory): void => {
+        handleInputChange('category', selectedCategory);
+        setShowCategories(false);
+    };
+
+    // Validate form before submission
+    const validateForm = () => {
+        const errors: { [key: string]: string } = {};
+        const requiredFields: Array<{ key: keyof typeof recipeForm; label: string }> = [
+            { key: 'title', label: 'Recipe title' },
+            { key: 'description', label: 'Description' },
+            { key: 'ingredients', label: 'Ingredients' },
+            { key: 'preparationSteps', label: 'Preparation steps' },
+            { key: 'preparationTime', label: 'Preparation time' },
+            { key: 'countryOfOrigin', label: 'Country of origin' },
+            { key: 'tags', label: 'Tags' },
+            { key: 'category', label: 'Category' },
+        ];
+
+        // Check required fields
+        requiredFields.forEach((field) => {
+            if (!recipeForm[field.key].trim()) {
+                errors[field.key] = `${field.label} is required`;
+            }
+        });
+
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
 
     // Handle form submission
-    const handleSubmit = (): void => {
-        // Validation
-        if (
-            !title.trim() ||
-            !description.trim() ||
-            !ingredients.trim() ||
-            !preparationSteps.trim() ||
-            !preparationTime.trim() ||
-            !countryOfOrigin.trim() ||
-            !tags.trim() ||
-            !category.trim()
-        ) {
+    const handleSubmit = async (): Promise<void> => {
+        // Validate form
+        if (!validateForm()) {
             Alert.alert(
                 'Missing Information',
                 'Please fill in all required fields'
@@ -85,57 +134,80 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
             return;
         }
 
-        // Create recipe object
-        const newRecipe: Recipe = {
-            id: Math.floor(1000 + Math.random() * 9000), // Generate random ID
-            title: title,
-            description: description,
-            image_url: imageUrl,
-            ingredients: ingredients.split(',').map((item) => item.trim()),
-            preparation_steps: preparationSteps,
-            preparation_time: preparationTime,
-            country_of_origin: countryOfOrigin,
-            author: userId,
-            tags: tags.split(',').map((tag) => tag.trim()),
-            category: category,
-            likes: 0,
-            saved: false,
-            chefAvatar: '',
-        };
+        // Check authentication
+        if (!currentUser) {
+            Alert.alert('Error', 'You must be logged in to add recipes');
+            return;
+        }
 
-        const { loading, error, success, addNewRecipe } =
-            useAddNewRecipe(newRecipe);
+        try {
+            // Create recipe object
+            const newRecipe: Recipe = {
+                id: Math.floor(1000 + Math.random() * 9000), // Generate random ID
+                title: recipeForm.title,
+                description: recipeForm.description,
+                image_url: recipeForm.imageUrl,
+                ingredients: recipeForm.ingredients
+                    .split(',')
+                    .map((item) => item.trim()),
+                preparation_steps: recipeForm.preparationSteps,
+                preparation_time: recipeForm.preparationTime,
+                country_of_origin: recipeForm.countryOfOrigin,
+                author: currentUser.uid,
+                tags: recipeForm.tags.split(',').map((tag) => tag.trim()),
+                category: recipeForm.category as RecipeCategory,
+                likes: 0,
+                saved: false,
+                chefAvatar: '',
+            };
 
-        // Here you would normally send this data to your backend/API
-        console.log('New Recipe:', newRecipe);
+            // console.log('Recipe from new recipe screen', newRecipe);
 
-        // Show success message
-        if (success === true) {
-            Alert.alert(
-                'Recipe Added!',
-                `${title} has been added to your recipes`,
-                [{ text: 'OK', onPress: () => router.back() }]
-            );
-        } else if (error) {
-            Alert.alert('Error', error);
+            // Add recipe
+            await addNewRecipe(newRecipe);
+        } catch (error) {
+            console.error('Error in handleSubmit:', error);
         }
     };
 
-    // Function to select a category
-    const selectCategory = (selectedCategory: RecipeCategory): void => {
-        setCategory(selectedCategory);
-        setShowCategories(false);
-    };
+    // Handle successful recipe addition
+    useEffect(() => {
+        if (success === true) {
+        
+            Alert.alert(
+                'Recipe Added!',
+                `${recipeForm.title} has been added to your recipes`,
+                [{ text: 'OK', onPress: () => router.push('/(tabs)/discover') }]
+            );
+        }
+    }, [success, recipeForm.title, router]);
 
-    // user not logged in error handling
-    if (error) {
+    // Render loading state
+    if (newRecipeLoading) {
         return (
-            <View>
-                <Text>{error}</Text>
+            <View style={styles.centeredContainer}>
+                <ActivityIndicator size="large" color="#FF6B6B" />
+                <Text style={styles.loadingText}>Adding your recipe...</Text>
             </View>
         );
     }
 
+    // Render error state
+    if (authError) {
+        return (
+            <View style={styles.centeredContainer}>
+                <Text style={styles.errorText}>{authError}</Text>
+                <TouchableOpacity
+                    style={styles.errorButton}
+                    onPress={() => router.back()}
+                >
+                    <Text style={styles.errorButtonText}>Go Back</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // Main render
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -145,14 +217,12 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
 
             {/* Header */}
             <View style={styles.header}>
-                {/* Back button */}
                 <TouchableOpacity
                     onPress={() => router.back()}
                     style={styles.backButton}
                 >
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
-                {/* Header title and save button */}
                 <Text style={styles.headerTitle}>Add New Recipe</Text>
                 <TouchableOpacity
                     onPress={handleSubmit}
@@ -162,12 +232,19 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
                 </TouchableOpacity>
             </View>
 
+            {/* Error Banner */}
+            {newRecipeError && (
+                <View style={styles.errorBanner}>
+                    <Text style={styles.errorBannerText}>{newRecipeError}</Text>
+                </View>
+            )}
+
             <ScrollView style={styles.formContainer}>
-                {/* Recipe Image Placeholder */}
+                {/* Recipe Image */}
                 <View style={styles.imageContainer}>
-                    {imageUrl ? (
+                    {recipeForm.imageUrl ? (
                         <Image
-                            source={{ uri: imageUrl }}
+                            source={{ uri: recipeForm.imageUrl }}
                             style={styles.recipeImage}
                         />
                     ) : (
@@ -181,102 +258,104 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
                     <TextInput
                         style={styles.imageUrlInput}
                         placeholder="Enter image URL"
-                        value={imageUrl}
-                        onChangeText={setImageUrl}
+                        value={recipeForm.imageUrl}
+                        onChangeText={(value) =>
+                            handleInputChange('imageUrl', value)
+                        }
                     />
                 </View>
 
                 {/* Title */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Recipe Title*</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter recipe name"
-                        value={title}
-                        onChangeText={setTitle}
-                    />
-                </View>
+                <FormField
+                    label="Recipe Title*"
+                    placeholder="Enter recipe name"
+                    value={recipeForm.title}
+                    onChangeText={(value) => handleInputChange('title', value)}
+                    error={formErrors.title}
+                />
 
                 {/* Description */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Description*</Text>
-                    <TextInput
-                        style={[styles.input, styles.textArea]}
-                        placeholder="Describe your recipe"
-                        value={description}
-                        onChangeText={setDescription}
-                        multiline
-                    />
-                </View>
+                <FormField
+                    label="Description*"
+                    placeholder="Describe your recipe"
+                    value={recipeForm.description}
+                    onChangeText={(value) =>
+                        handleInputChange('description', value)
+                    }
+                    multiline
+                    textArea
+                    error={formErrors.description}
+                />
 
                 {/* Ingredients */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>
-                        Ingredients* (comma separated)
-                    </Text>
-                    <TextInput
-                        style={[styles.input, styles.textArea]}
-                        placeholder="E.g., rice, lentils, pasta, salsa"
-                        value={ingredients}
-                        onChangeText={setIngredients}
-                        multiline
-                    />
-                </View>
+                <FormField
+                    label="Ingredients* (comma separated)"
+                    placeholder="E.g., rice, lentils, pasta, salsa"
+                    value={recipeForm.ingredients}
+                    onChangeText={(value) =>
+                        handleInputChange('ingredients', value)
+                    }
+                    multiline
+                    textArea
+                    error={formErrors.ingredients}
+                />
 
                 {/* Preparation Steps */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Preparation Steps*</Text>
-                    <TextInput
-                        style={[styles.input, styles.textArea]}
-                        placeholder="Step-by-step instructions"
-                        value={preparationSteps}
-                        onChangeText={setPreparationSteps}
-                        multiline
-                    />
-                </View>
+                <FormField
+                    label="Preparation Steps*"
+                    placeholder="Step-by-step instructions"
+                    value={recipeForm.preparationSteps}
+                    onChangeText={(value) =>
+                        handleInputChange('preparationSteps', value)
+                    }
+                    multiline
+                    textArea
+                    error={formErrors.preparationSteps}
+                />
 
                 {/* Preparation Time */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Preparation Time</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="E.g., 30 minutes"
-                        value={preparationTime}
-                        onChangeText={setPreparationTime}
-                    />
-                </View>
+                <FormField
+                    label="Preparation Time*"
+                    placeholder="E.g., 30 minutes"
+                    value={recipeForm.preparationTime}
+                    onChangeText={(value) =>
+                        handleInputChange('preparationTime', value)
+                    }
+                    error={formErrors.preparationTime}
+                />
 
                 {/* Country of Origin */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Country of Origin</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="E.g., Egypt"
-                        value={countryOfOrigin}
-                        onChangeText={setCountryOfOrigin}
-                    />
-                </View>
+                <FormField
+                    label="Country of Origin*"
+                    placeholder="E.g., Egypt"
+                    value={recipeForm.countryOfOrigin}
+                    onChangeText={(value) =>
+                        handleInputChange('countryOfOrigin', value)
+                    }
+                    error={formErrors.countryOfOrigin}
+                />
 
                 {/* Tags */}
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Tags (comma separated)</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="E.g., breakfast, healthy, vegan"
-                        value={tags}
-                        onChangeText={setTags}
-                    />
-                </View>
+                <FormField
+                    label="Tags* (comma separated)"
+                    placeholder="E.g., breakfast, healthy, vegan"
+                    value={recipeForm.tags}
+                    onChangeText={(value) => handleInputChange('tags', value)}
+                    error={formErrors.tags}
+                />
 
                 {/* Category Dropdown */}
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Category</Text>
+                    <Text style={styles.label}>Category*</Text>
                     <TouchableOpacity
-                        style={styles.dropdownButton}
+                        style={[
+                            styles.dropdownButton,
+                            formErrors.category && styles.inputError,
+                        ]}
                         onPress={() => setShowCategories(!showCategories)}
                     >
                         <Text style={styles.dropdownButtonText}>
-                            {category || 'Select Category'}
+                            {recipeForm.category || 'Select Category'}
                         </Text>
                         <Ionicons
                             name={
@@ -286,6 +365,11 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
                             color="#555"
                         />
                     </TouchableOpacity>
+                    {formErrors.category && (
+                        <Text style={styles.errorText}>
+                            {formErrors.category}
+                        </Text>
+                    )}
 
                     {showCategories && (
                         <View style={styles.categoryDropdown}>
@@ -309,9 +393,10 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
                     <TouchableOpacity
                         style={styles.submitButton}
                         onPress={handleSubmit}
+                        disabled={newRecipeLoading}
                     >
                         <Text style={styles.submitButtonText}>
-                            Create Recipe
+                            {newRecipeLoading ? 'Creating...' : 'Create Recipe'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -327,10 +412,89 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = ({}) => {
     );
 };
 
+// Form Field Component with error handling
+interface FormFieldProps {
+    label: string;
+    placeholder: string;
+    value: string;
+    onChangeText: (text: string) => void;
+    multiline?: boolean;
+    textArea?: boolean;
+    error?: string | null;
+}
+
+const FormField: React.FC<FormFieldProps> = ({
+    label,
+    placeholder,
+    value,
+    onChangeText,
+    multiline = false,
+    textArea = false,
+    error = null,
+}) => (
+    <View style={styles.inputGroup}>
+        <Text style={styles.label}>{label}</Text>
+        <TextInput
+            style={[
+                styles.input,
+                textArea && styles.textArea,
+                error && styles.inputError,
+            ]}
+            placeholder={placeholder}
+            value={value}
+            onChangeText={onChangeText}
+            multiline={multiline}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
+);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f9f9f9',
+    },
+    centeredContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f9f9f9',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#555',
+    },
+    errorText: {
+        fontSize: 12,
+        color: '#d32f2f',
+        marginTop: 4,
+    },
+    errorBanner: {
+        backgroundColor: '#ffebee',
+        padding: 10,
+        borderRadius: 5,
+        margin: 10,
+        borderLeftWidth: 4,
+        borderLeftColor: '#d32f2f',
+    },
+    errorBannerText: {
+        color: '#d32f2f',
+        fontSize: 14,
+    },
+    inputError: {
+        borderColor: '#d32f2f',
+    },
+    errorButton: {
+        backgroundColor: '#FF6B6B',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 8,
+    },
+    errorButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
     header: {
         flexDirection: 'row',
