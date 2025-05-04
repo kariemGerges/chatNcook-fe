@@ -112,10 +112,10 @@ export default function SavedRecipesScreen() {
     };
 
     // Navigate to recipe details
-    const viewRecipeDetails = (recipeId: number) => {
+    const viewRecipeDetails = (Recipe:Recipe) => {
         router.push({
             pathname: '/screens/singleRecipe',
-            params: { recipeDetail: JSON.stringify(recipeId) },
+            params: { recipeDetail: JSON.stringify(Recipe) },
         });
     };
 
@@ -140,7 +140,7 @@ export default function SavedRecipesScreen() {
     const renderRecipeCard = ({ item }: { item: Recipe }) => (
         <TouchableOpacity
             style={styles.recipeCard}
-            onPress={() => viewRecipeDetails(item.id)}
+            onPress={() => viewRecipeDetails(item)}
         >
             <Image
                 source={

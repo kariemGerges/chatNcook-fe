@@ -143,7 +143,7 @@ const AddNewRecipeScreen: React.FC<AddNewRecipeScreenProps> = () => {
         try {
             // Create recipe object
             const newRecipe: Recipe = {
-                id: Math.floor(1000 + Math.random() * 9000), // Generate random ID
+                id: Math.floor(1000 + Math.random() * 900), // Generate random ID
                 title: recipeForm.title,
                 description: recipeForm.description,
                 image_url: recipeForm.imageUrl,

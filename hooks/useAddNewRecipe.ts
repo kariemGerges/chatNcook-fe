@@ -42,7 +42,7 @@ export const useAddNewRecipe = () => {
                 ingredients: Array.isArray(recipe.ingredients)
                     ? recipe.ingredients
                     : typeof recipe.ingredients === 'string'
-                    ? recipe.ingredients.split(',').map((item) => item.trim())
+                    ? (recipe.ingredients as string).split(',').map((item) => item.trim())
                     : [],
                 // Make sure these fields exist and are of correct type
                 preparation_time: recipe.preparation_time || '',
