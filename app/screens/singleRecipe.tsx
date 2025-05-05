@@ -167,7 +167,7 @@ export default function RecipeDetails() {
           </View>
 
           <View style={styles.tagsContainer}>
-            {recipe.tags.map((tag, index) => (
+            {recipe.tags?.map((tag, index) => (
               <Animated.View 
                 key={index}
                 entering={FadeInDown.delay(index * 100)}
@@ -191,7 +191,7 @@ export default function RecipeDetails() {
             style={styles.section}
           >
             <Text style={styles.sectionTitle}>Ingredients</Text>
-            {recipe.ingredients.map((ingredient, index) => (
+            {recipe.ingredients?.map((ingredient, index) => (
               <View key={index} style={styles.ingredientRow}>
                 <MaterialCommunityIcons name="circle-small" size={24} color="#666" />
                 <Text style={styles.ingredient}>{ingredient}</Text>

@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Recipe, apiResponseRecipeById } from '@/assets/types/types';
+import { Recipe, apiResponseRecipeByUserId } from '@/assets/types/types';
 
-const useRecipeFetcherByUserId = (userId: string): apiResponseRecipeById => {
+const useRecipeFetcherByUserId = (
+    userId: string
+): apiResponseRecipeByUserId => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [recipeCount, setRecipeCount] = useState<number>(0);
+    const [success, setSuccess] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -20,20 +24,22 @@ const useRecipeFetcherByUserId = (userId: string): apiResponseRecipeById => {
             setError(null);
 
             try {
-                const query = userId
+                const query = userId;
                 const response = await axios.get(
                     `https://chatncook-be.onrender.com/recipes/${query}`
                 );
                 console.log('Response data:', response.data);
 
                 // Check if response.data has the expected structure
-                if (response.data && Array.isArray(response.data)) {
-                    setRecipes(response.data);
+                if (response.data?.data && Array.isArray(response.data.data)) {
+                    setSuccess(true);
+                    setRecipeCount(response.data.recipeCount);
+                    setRecipes(response.data.data);
 
                     if (isRefresh) {
                         await AsyncStorage.setItem(
                             '@recipes',
-                            JSON.stringify(response.data)
+                            JSON.stringify(response.data.data)
                         );
                     }
                 } else {
@@ -65,6 +71,8 @@ const useRecipeFetcherByUserId = (userId: string): apiResponseRecipeById => {
 
     return {
         recipes,
+        recipeCount,
+        success,
         loading,
         error,
         refreshing,

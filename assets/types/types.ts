@@ -54,6 +54,16 @@ export type apiResponseRecipeById = {
     refresh: () => void;
 };
 
+export type apiResponseRecipeByUserId = {
+    recipes: Recipe[];
+    recipeCount: number;
+    success: boolean;
+    loading: boolean;
+    error: string | null;
+    refreshing: boolean;
+    refresh: () => void;
+};
+
 // recipe card type
 export interface RecipeCardProps {
     recipe: Recipe;

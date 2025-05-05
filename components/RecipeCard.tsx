@@ -53,36 +53,36 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <View style={styles.imageContainer}>
                 <Image
                     defaultSource={require('@/assets/images/sginup.webp')}
-                    source={{ uri: recipe.image_url }}
+                    source={{ uri: recipe?.image_url? recipe.image_url : 'https://example.com/default-image.jpg' }}
                     style={styles.image}
                     resizeMode="cover"
                 />
                 <View style={styles.tagContainer}>
-                    {recipe.tags.map((tag) => (
+                    {recipe?.tags.map((tag) => (
                         <View key={tag} style={styles.tag}>
                             <Text style={styles.tagText}>{tag}</Text>
                         </View>
                     ))}
                 </View>
                 <View style={styles.categoryContainer}>
-                    <Text style={styles.categoryText}>{recipe.category}</Text>
+                    <Text style={styles.categoryText}>{recipe?.category}</Text>
                 </View>
             </View>
 
             {/* Content Section */}
             <View style={styles.content}>
                 <View style={styles.header}>
-                    <Text style={styles.title}>{recipe.title}</Text>
+                    <Text style={styles.title}>{recipe?.title}</Text>
                     <View style={styles.authorContainer}>
                         <FontAwesome name="user" size={14} color="#666" />
                         <Text style={styles.authorText}>
-                            By {recipe.author}
+                            By {recipe?.author}
                         </Text>
                     </View>
                 </View>
 
                 <Text style={styles.description} numberOfLines={2}>
-                    {recipe.description}
+                    {recipe?.description}
                 </Text>
 
                 {/* Recipe Info Grid */}
@@ -92,7 +92,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         <View>
                             <Text style={styles.infoLabel}>Prep Time</Text>
                             <Text style={styles.infoValue}>
-                                {recipe.preparation_time}
+                                {recipe?.preparation_time}
                             </Text>
                         </View>
                     </View>
@@ -102,7 +102,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         <View>
                             <Text style={styles.infoLabel}>Origin</Text>
                             <Text style={styles.infoValue}>
-                                {recipe.country_of_origin}
+                                {recipe?.country_of_origin}
                             </Text>
                         </View>
                     </View>
@@ -112,7 +112,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         <View>
                             <Text style={styles.infoLabel}>Ingredients</Text>
                             <Text style={styles.infoValue}>
-                                {recipe.ingredients.length} items
+                                {recipe?.ingredients.length} items
                             </Text>
                         </View>
                     </View>
@@ -122,7 +122,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         <View>
                             <Text style={styles.infoLabel}>Category</Text>
                             <Text style={styles.infoValue}>
-                                {recipe.category}
+                                {recipe?.category}
                             </Text>
                         </View>
                     </View>

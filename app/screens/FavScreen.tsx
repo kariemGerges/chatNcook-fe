@@ -1,5 +1,5 @@
 // app/favorites.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -27,25 +27,11 @@ import {
     Timer,
     ChefHat,
 } from 'lucide-react-native';
-import { collection } from 'firebase/firestore';
+import { auth } from '@/firebaseConfig';
 import { RecipeCard } from '@/components/RecipeCard';
 import useRecipeFetcherByUserId from '@/hooks/useFetchRecipeByUserId';
 
-// Define types
-interface Recipe {
-    id: string;
-    title: string;
-    chef: string;
-    chefAvatar: string;
-    image: string;
-    rating: number;
-    prepTime: number;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-    cuisine: string;
-    tags: string[];
-    saved: boolean;
-    dateAdded: string;
-}
+import { Recipe } from '@/assets/types/types';
 
 interface Collection {
     id: string;
@@ -70,141 +56,23 @@ export default function FavoritesScreen(): React.ReactNode {
     // const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [collections, setCollections] = useState<Collection[]>([]);
 
-    const { recipes, loading, error, refreshing, refresh } =
-        useRecipeFetcherByUserId('7amo el soni abo ras bonii');
+    const currentUser = auth.currentUser;
 
-    // Fetch mock data
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                // In a real app, you'd fetch this from an API
-                await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    if (!currentUser) {
+        return;
+    }
 
-                // Mock recipes data
-                setRecipes([
-                    {
-                        id: '1',
-                        title: 'Spicy Thai Basil Chicken',
-                        chef: 'Maria Chen',
-                        chefAvatar: 'https://placeholder.com/user1',
-                        image: 'thai-basil-chicken',
-                        rating: 4.8,
-                        prepTime: 25,
-                        difficulty: 'Medium',
-                        cuisine: 'Thai',
-                        tags: ['chicken', 'spicy', 'dinner'],
-                        saved: true,
-                        dateAdded: '2025-04-28T14:23:00Z',
-                    },
-                    {
-                        id: '2',
-                        title: 'Classic Tiramisu',
-                        chef: 'Giovanni Romano',
-                        chefAvatar: 'https://placeholder.com/user2',
-                        image: 'tiramisu',
-                        rating: 4.9,
-                        prepTime: 40,
-                        difficulty: 'Medium',
-                        cuisine: 'Italian',
-                        tags: ['dessert', 'coffee', 'no-bake'],
-                        saved: true,
-                        dateAdded: '2025-04-25T09:15:00Z',
-                    },
-                    {
-                        id: '3',
-                        title: 'Creamy Mushroom Risotto',
-                        chef: 'Sophia Martinez',
-                        chefAvatar: 'https://placeholder.com/user3',
-                        image: 'mushroom-risotto',
-                        rating: 4.7,
-                        prepTime: 35,
-                        cuisine: 'Italian',
-                        difficulty: 'Medium',
-                        tags: ['vegetarian', 'dinner', 'rice'],
-                        saved: true,
-                        dateAdded: '2025-04-20T18:45:00Z',
-                    },
-                    {
-                        id: '4',
-                        title: 'Quick Avocado Toast',
-                        chef: 'Alex Johnson',
-                        chefAvatar: 'https://placeholder.com/user4',
-                        image: 'avocado-toast',
-                        rating: 4.5,
-                        prepTime: 10,
-                        difficulty: 'Easy',
-                        cuisine: 'American',
-                        tags: ['breakfast', 'vegetarian', 'quick'],
-                        saved: true,
-                        dateAdded: '2025-04-30T07:30:00Z',
-                    },
-                    {
-                        id: '5',
-                        title: 'Homemade Chicken Noodle Soup',
-                        chef: 'James Peterson',
-                        chefAvatar: 'https://placeholder.com/user5',
-                        image: 'chicken-soup',
-                        rating: 4.6,
-                        prepTime: 60,
-                        difficulty: 'Medium',
-                        cuisine: 'American',
-                        tags: ['soup', 'comfort food', 'dinner'],
-                        saved: true,
-                        dateAdded: '2025-04-15T12:10:00Z',
-                    },
-                    {
-                        id: '6',
-                        title: 'Blueberry Pancakes',
-                        chef: 'Emma Wilson',
-                        chefAvatar: 'https://placeholder.com/user6',
-                        image: 'blueberry-pancakes',
-                        rating: 4.7,
-                        prepTime: 20,
-                        difficulty: 'Easy',
-                        cuisine: 'American',
-                        tags: ['breakfast', 'sweet', 'fruit'],
-                        saved: true,
-                        dateAdded: '2025-04-27T08:20:00Z',
-                    },
-                ]);
+    const userId = currentUser.uid;
 
-                // Mock collections data
-                setCollections([
-                    {
-                        id: '1',
-                        name: 'Weekend Brunch Ideas',
-                        recipeCount: 8,
-                        coverImage: 'brunch-collection',
-                    },
-                    {
-                        id: '2',
-                        name: 'Quick Weeknight Dinners',
-                        recipeCount: 12,
-                        coverImage: 'weeknight-dinners',
-                    },
-                    {
-                        id: '3',
-                        name: 'Italian Favorites',
-                        recipeCount: 6,
-                        coverImage: 'italian-food',
-                    },
-                    {
-                        id: '4',
-                        name: 'Healthy Meal Prep',
-                        recipeCount: 15,
-                        coverImage: 'meal-prep',
-                    },
-                ]);
-            } catch (error) {
-                console.error('Failed to fetch favorites data', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
+    const {
+        recipes,
+        recipeCount,
+        success,
+        loading,
+        error,
+        refreshing,
+        refresh,
+    } = useRecipeFetcherByUserId(userId);
 
     // Filter and sort recipes based on current settings
     const filteredAndSortedRecipes = React.useMemo(() => {
@@ -219,7 +87,7 @@ export default function FavoritesScreen(): React.ReactNode {
                     recipe.tags.some((tag) =>
                         tag.toLowerCase().includes(query)
                     ) ||
-                    recipe.cuisine.toLowerCase().includes(query)
+                    recipe.country_of_origin.toLowerCase().includes(query)
             );
         }
 
@@ -246,18 +114,22 @@ export default function FavoritesScreen(): React.ReactNode {
                 result.sort((a, b) => a.title.localeCompare(b.title));
                 break;
             case 'rating':
-                result.sort((a, b) => b.rating - a.rating);
+                result.sort((a, b) => b.likes - a.likes);
                 break;
             case 'prepTime':
-                result.sort((a, b) => a.prepTime - b.prepTime);
+                result.sort(
+                    (a, b) =>
+                        parseInt(a.preparation_time) -
+                        parseInt(b.preparation_time)
+                );
                 break;
             case 'recent':
             default:
-                result.sort(
-                    (a, b) =>
-                        new Date(b.dateAdded).getTime() -
-                        new Date(a.dateAdded).getTime()
-                );
+                // result.sort(
+                //     (a, b) =>
+                //         new Date(b.dateAdded).getTime() -
+                //         new Date(a.dateAdded).getTime()
+                // );
                 break;
         }
 
@@ -274,37 +146,37 @@ export default function FavoritesScreen(): React.ReactNode {
     }, [collections, searchQuery]);
 
     // Toggle recipe bookmark/saved status
-    const toggleSaveRecipe = (recipeId: string) => {
-        setRecipes((prevRecipes) =>
-            prevRecipes.map((recipe) =>
-                recipe.id === recipeId
-                    ? { ...recipe, saved: !recipe.saved }
-                    : recipe
-            )
-        );
+    // const toggleSaveRecipe = (recipeId: string) => {
+    //     setRecipes((prevRecipes) =>
+    //         prevRecipes.map((recipe) =>
+    //             recipe.id === recipeId
+    //                 ? { ...recipe, saved: !recipe.saved }
+    //                 : recipe
+    //         )
+    //     );
 
-        // If recipe is being unsaved, show confirmation
-        const recipe = recipes.find((r) => r.id === recipeId);
-        if (recipe?.saved) {
-            Alert.alert(
-                'Remove from Favorites',
-                `"${recipe.title}" will be removed from your favorites.`,
-                [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                        text: 'Remove',
-                        style: 'destructive',
-                        onPress: () => {
-                            // In a real app, you would call an API here
-                            setRecipes((prevRecipes) =>
-                                prevRecipes.filter((r) => r.id !== recipeId)
-                            );
-                        },
-                    },
-                ]
-            );
-        }
-    };
+    //     // If recipe is being unsaved, show confirmation
+    //     const recipe = recipes.find((r) => r.id === recipeId);
+    //     if (recipe?.saved) {
+    //         Alert.alert(
+    //             'Remove from Favorites',
+    //             `"${recipe.title}" will be removed from your favorites.`,
+    //             [
+    //                 { text: 'Cancel', style: 'cancel' },
+    //                 {
+    //                     text: 'Remove',
+    //                     style: 'destructive',
+    //                     onPress: () => {
+    //                         // In a real app, you would call an API here
+    //                         setRecipes((prevRecipes) =>
+    //                             prevRecipes.filter((r) => r.id !== recipeId)
+    //                         );
+    //                     },
+    //                 },
+    //             ]
+    //         );
+    //     }
+    // };
 
     // Delete a collection
     const deleteCollection = (collectionId: string) => {
@@ -330,10 +202,11 @@ export default function FavoritesScreen(): React.ReactNode {
     };
 
     // Navigate to recipe details
-    const goToRecipeDetails = (recipeId: string) => {
-        // In a real app, you would navigate to the recipe details screen
-        console.log(`Navigate to recipe ${recipeId}`);
-        // router.push(`/recipe/${recipeId}`);
+    const viewRecipeDetails = (Recipe: Recipe) => {
+        router.push({
+            pathname: '/screens/singleRecipe',
+            params: { recipeDetail: JSON.stringify(Recipe) },
+        });
     };
 
     // Navigate to collection details
@@ -347,88 +220,11 @@ export default function FavoritesScreen(): React.ReactNode {
     const renderRecipeItem = ({ item }: { item: Recipe }) => (
         <TouchableOpacity
             style={styles.recipeCard}
-            onPress={() => goToRecipeDetails(item.id)}
+            onPress={() => viewRecipeDetails(item)}
             activeOpacity={0.8}
+            key={item._id}
         >
-            <View style={styles.recipeImageContainer}>
-                {/* Using placeholder image - in a real app, load real images */}
-                <View
-                    style={[
-                        styles.recipePlaceholderImage,
-                        { backgroundColor: getColorFromString(item.image) },
-                    ]}
-                >
-                    <ChefHat size={24} color="#ffffff" />
-                </View>
-
-                {/* Bookmark button */}
-                <TouchableOpacity
-                    style={styles.bookmarkButton}
-                    onPress={() => toggleSaveRecipe(item.id)}
-                >
-                    <Heart size={18} color="#FF6B6B" fill="#FF6B6B" />
-                </TouchableOpacity>
-
-                {/* Difficulty label */}
-                <View
-                    style={[
-                        styles.difficultyLabel,
-                        item.difficulty === 'Easy'
-                            ? styles.easyLabel
-                            : item.difficulty === 'Hard'
-                            ? styles.hardLabel
-                            : styles.mediumLabel,
-                    ]}
-                >
-                    <Text style={styles.difficultyText}>{item.difficulty}</Text>
-                </View>
-            </View>
-
-            <View style={styles.recipeInfo}>
-                <Text style={styles.recipeTitle} numberOfLines={1}>
-                    {item.title}
-                </Text>
-
-                <View style={styles.recipeMetaContainer}>
-                    <View style={styles.chefContainer}>
-                        <View style={styles.chefAvatar}>
-                            {/* Using single letter avatar - in a real app, load real avatar */}
-                            <Text style={styles.chefAvatarText}>
-                                {item.chef.charAt(0)}
-                            </Text>
-                        </View>
-                        <Text style={styles.chefName} numberOfLines={1}>
-                            {item.chef}
-                        </Text>
-                    </View>
-
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statItem}>
-                            <Star size={14} color="#FFD166" />
-                            <Text style={styles.statText}>{item.rating}</Text>
-                        </View>
-                        <View style={styles.statItem}>
-                            <Timer size={14} color="#4ECDC4" />
-                            <Text style={styles.statText}>
-                                {item.prepTime} min
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-
-                <View style={styles.tagsContainer}>
-                    {item.tags.slice(0, 2).map((tag, index) => (
-                        <View key={index} style={styles.tagItem}>
-                            <Text style={styles.tagText}>#{tag}</Text>
-                        </View>
-                    ))}
-                    {item.tags.length > 2 && (
-                        <Text style={styles.moreTagsText}>
-                            +{item.tags.length - 2}
-                        </Text>
-                    )}
-                </View>
-            </View>
+            <RecipeCard recipe={item} />
         </TouchableOpacity>
     );
 
@@ -442,7 +238,7 @@ export default function FavoritesScreen(): React.ReactNode {
             <View
                 style={[
                     styles.collectionImageContainer,
-                    { backgroundColor: getColorFromString(item.coverImage) },
+                    // { backgroundColor: getColorFromString(item.coverImage) },
                 ]}
             >
                 <Text style={styles.collectionImageText}>
@@ -468,27 +264,6 @@ export default function FavoritesScreen(): React.ReactNode {
         </TouchableOpacity>
     );
 
-    // Generate a deterministic color from a string
-    const getColorFromString = (str: string): string => {
-        const colors = [
-            '#FF6B6B',
-            '#4ECDC4',
-            '#FFD166',
-            '#6A0572',
-            '#1A535C',
-            '#F78C6C',
-            '#5E60CE',
-            '#7CB518',
-        ];
-
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        }
-
-        return colors[Math.abs(hash) % colors.length];
-    };
-
     // Render empty state
     const renderEmptyState = () => (
         <View style={styles.emptyStateContainer}>
@@ -502,6 +277,21 @@ export default function FavoritesScreen(): React.ReactNode {
             </TouchableOpacity>
         </View>
     );
+
+    // Render error state
+    const renderErrorState = () => (
+        <View style={styles.emptyStateContainer}>
+            <Text style={styles.emptyStateTitle}>Something went wrong</Text>
+            <Text style={styles.emptyStateText}>Please try again later.</Text>
+            <TouchableOpacity style={styles.exploreButton}>
+                <Text style={styles.exploreButtonText}>Retry</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    if (error) {
+        return renderErrorState();
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -694,7 +484,7 @@ export default function FavoritesScreen(): React.ReactNode {
                             activeTab === 'recipes' && styles.activeTabText,
                         ]}
                     >
-                        Recipes
+                        Recipes ({recipeCount})
                     </Text>
                 </TouchableOpacity>
 
@@ -729,11 +519,13 @@ export default function FavoritesScreen(): React.ReactNode {
                     {activeTab === 'recipes' &&
                         (filteredAndSortedRecipes.length > 0 ? (
                             <FlatList
-                                data={filteredAndSortedRecipes}
+                                data={filteredAndSortedRecipes as Recipe[]}
                                 renderItem={renderRecipeItem}
-                                keyExtractor={(item) => item.id}
+                                keyExtractor={(item) => item._id}
                                 contentContainerStyle={styles.recipesList}
                                 showsVerticalScrollIndicator={false}
+                                onRefresh={refresh}
+                                refreshing={refreshing}
                             />
                         ) : (
                             renderEmptyState()
