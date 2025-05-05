@@ -22,7 +22,7 @@ export const useCarouselRecipe = (): UseCarouselRecipeResponse => {
             if (Array.isArray(response.data)) {
                 setRecipe(response.data);
             } else {
-                console.error('Unexpected response format', response.data);
+                // console.error('Unexpected response format', response.data);
                 setRecipe([]); // Fallback to empty array if format is unexpected
             }
             setLoading(false);

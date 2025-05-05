@@ -28,7 +28,7 @@ import {
     profileSchema,
     type ProfileData,
     type ValidationErrors,
-} from '@/app/screens/profileScreen/validation';
+} from './validation';
 import { z } from 'zod';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';

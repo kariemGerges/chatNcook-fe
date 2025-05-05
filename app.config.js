@@ -9,17 +9,17 @@ export default {
         icon: './assets/images/icon.png',
         scheme: 'myapp',
         userInterfaceStyle: 'automatic',
- extra: {
-      FIREBASE_APIKEY: process.env.FIREBASE_APIKEY,
-      FIREBASE_AUTHDOMAIN: process.env.FIREBASE_AUTHDOMAIN,
-      FIREBASE_PROJECTID: process.env.FIREBASE_PROJECTID,
-    //   FIREBASE_STOREAGEBUCKET: process.env.FIREBASE_STOREAGEBUCKET,
-    //   FIREBASE_MESSAGINGSENDERID: process.env.FIREBASE_MESSAGINGSENDERID,
-      FIREBASE_APPID: process.env.FIREBASE_APPID,
-      eas: {
-        projectId: "c500099c-ee9d-47b3-8477-38f9a135610f"
-      }
-    },
+        extra: {
+            FIREBASE_APIKEY: process.env.FIREBASE_APIKEY,
+            FIREBASE_AUTHDOMAIN: process.env.FIREBASE_AUTHDOMAIN,
+            FIREBASE_PROJECTID: process.env.FIREBASE_PROJECTID,
+            //   FIREBASE_STOREAGEBUCKET: process.env.FIREBASE_STOREAGEBUCKET,
+            //   FIREBASE_MESSAGINGSENDERID: process.env.FIREBASE_MESSAGINGSENDERID,
+            FIREBASE_APPID: process.env.FIREBASE_APPID,
+            eas: {
+                projectId: 'c500099c-ee9d-47b3-8477-38f9a135610f',
+            },
+        },
         newArchEnabled: true,
         ios: {
             supportsTablet: true,

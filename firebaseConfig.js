@@ -23,7 +23,6 @@ if (!FIREBASE_APIKEY
     throw new Error('Missing Firebase configuration in environment variables');
 }
 // Check if the environment variables are defined
-console.log('FIREBASE_APIKEY:', FIREBASE_APIKEY);
 
 // Firebase configuration
 const firebaseConfig = {

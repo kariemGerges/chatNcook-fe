@@ -21,7 +21,7 @@ import { AiFab } from '@/components/AiFab';
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
-    const [isSaved, setIsSaved] = useState(false);
+    // const [isSaved, setIsSaved] = useState(false);
 
     const [savedRecipes, setSavedRecipes] = useState<{
         [key: string]: boolean;
