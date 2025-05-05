@@ -28,6 +28,8 @@ import {
     ChefHat,
 } from 'lucide-react-native';
 import { collection } from 'firebase/firestore';
+import { RecipeCard } from '@/components/RecipeCard';
+import useRecipeFetcherByUserId from '@/hooks/useFetchRecipeByUserId';
 
 // Define types
 interface Recipe {
@@ -57,7 +59,7 @@ type FilterOption = 'all' | 'meals' | 'desserts' | 'drinks' | 'snacks';
 
 export default function FavoritesScreen(): React.ReactNode {
     const router = useRouter();
-    const [loading, setLoading] = useState<boolean>(true);
+    // const [loading, setLoading] = useState<boolean>(true);
     const [activeTab, setActiveTab] = useState<'recipes' | 'collections'>(
         'recipes'
     );
@@ -65,8 +67,11 @@ export default function FavoritesScreen(): React.ReactNode {
     const [sortBy, setSortBy] = useState<SortOption>('recent');
     const [filterBy, setFilterBy] = useState<FilterOption>('all');
     const [showSortMenu, setShowSortMenu] = useState<boolean>(false);
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    // const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [collections, setCollections] = useState<Collection[]>([]);
+
+    const { recipes, loading, error, refreshing, refresh } =
+        useRecipeFetcherByUserId('7amo el soni abo ras bonii');
 
     // Fetch mock data
     useEffect(() => {
