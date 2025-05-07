@@ -69,7 +69,6 @@ export default function HomeScreenRecipeCard({ toggleSaved }: Props) {
             style={styles.trendingCard}
         >
             <Image
-                defaultSource={require('@/assets/images/sginup.webp')}
                 source={{
                     uri: item.image_url
                         ? item.image_url
@@ -217,6 +216,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 150,
         resizeMode: 'cover',
+        backgroundColor: 'rgba(247, 182, 154, 0.3)',
+        borderTopLeftRadius: 16,
     },
     saveButton: {
         position: 'absolute',

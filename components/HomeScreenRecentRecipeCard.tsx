@@ -15,8 +15,12 @@ import { useCarouselRecipe } from '@/hooks/useCarouselRecipe';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoadingItem from './SkeletonLoadingItem';
 
+interface Props {
+    toggleSaved: (id: string) => void;
+}
 
-export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
+export default function HomeScreenRecentRecipeCard({ toggleSaved }: Props) {
+    // Fetching trending recipes
     const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
 
     const displayedRecipes = recipe?.slice(0, 4);
@@ -32,8 +36,11 @@ export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
             style={styles.recentCard}
         >
             <Image
-                defaultSource={require('@/assets/images/sginup.webp')}
-                source={{ uri: item.image_url }}
+                source={{
+                    uri: item.image_url
+                        ? item.image_url
+                        : require('@/assets/images/sginup.webp'),
+                }}
                 style={styles.recentImage}
             />
             <View style={styles.recentInfo}>
@@ -57,7 +64,7 @@ export default function HomeScreenRecentRecipeCard(toggleSaved: any) {
             </View>
             <TouchableOpacity
                 style={styles.recentSaveButton}
-                onPress={() => toggleSaved(item.id)}
+                onPress={() => toggleSaved(item.id.toString())}
             >
                 <Ionicons
                     name={item.saved ? 'bookmark' : 'bookmark-outline'}
@@ -156,6 +163,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 100,
         resizeMode: 'cover',
+        backgroundColor: 'rgba(247, 182, 154, 0.3)',
     },
     recentInfo: {
         padding: 10,

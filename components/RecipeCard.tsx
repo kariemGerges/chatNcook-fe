@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
+        backgroundColor: 'rgba(247, 182, 154, 0.3)',
     },
     tagContainer: {
         position: 'absolute',

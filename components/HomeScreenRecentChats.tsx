@@ -215,7 +215,7 @@ export default function HomeScreenRecentChats() {
                     <Text style={styles.noChatsText}>No chats available</Text>
                 }
                 renderItem={renderChatItem}
-                // style={styles.container}
+                style={styles.container}
                 contentContainerStyle={styles.chatsList}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#FFEBC6',
+        // backgroundColor: '#FFEBC6',
     },
     contentContainer: {
         paddingBottom: 20,

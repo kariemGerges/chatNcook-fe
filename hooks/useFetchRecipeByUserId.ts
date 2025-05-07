@@ -33,8 +33,9 @@ const useRecipeFetcherByUserId = (
                 // Check if response.data has the expected structure
                 if (response.data?.data && Array.isArray(response.data.data)) {
                     setSuccess(true);
-                    setRecipeCount(response.data.recipeCount);
-                    setRecipes(response.data.data);
+                    setRecipeCount((response.data.recipeCount || 0));
+                    setRecipes(response.data.data || []);
+                    setError(null);
 
                     if (isRefresh) {
                         await AsyncStorage.setItem(

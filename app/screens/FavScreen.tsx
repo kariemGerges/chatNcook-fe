@@ -45,7 +45,6 @@ type FilterOption = 'all' | 'meals' | 'desserts' | 'drinks' | 'snacks';
 
 export default function FavoritesScreen(): React.ReactNode {
     const router = useRouter();
-    // const [loading, setLoading] = useState<boolean>(true);
     const [activeTab, setActiveTab] = useState<'recipes' | 'collections'>(
         'recipes'
     );
@@ -53,13 +52,22 @@ export default function FavoritesScreen(): React.ReactNode {
     const [sortBy, setSortBy] = useState<SortOption>('recent');
     const [filterBy, setFilterBy] = useState<FilterOption>('all');
     const [showSortMenu, setShowSortMenu] = useState<boolean>(false);
-    // const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [collections, setCollections] = useState<Collection[]>([]);
 
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-        return;
+        return (
+            <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyStateTitle}>Please Login</Text>
+                <TouchableOpacity
+                    style={styles.exploreButton}
+                    onPress={() => router.push('/screens/LoginScreen')}
+                >
+                    <Text style={styles.exploreButtonText}>Login</Text>
+                </TouchableOpacity>
+            </View>
+        );
     }
 
     const userId = currentUser.uid;
@@ -270,10 +278,13 @@ export default function FavoritesScreen(): React.ReactNode {
             <Bookmark size={64} color="#ccc" />
             <Text style={styles.emptyStateTitle}>No favorites yet</Text>
             <Text style={styles.emptyStateText}>
-                Save recipes you love to find them here.
+                Add recipes you love to find them here.
             </Text>
-            <TouchableOpacity style={styles.exploreButton}>
-                <Text style={styles.exploreButtonText}>Explore Recipes</Text>
+            <TouchableOpacity
+                onPress={() => router.push('/screens/newRecipe')}
+                style={styles.exploreButton}
+            >
+                <Text style={styles.exploreButtonText}>Add Recipes</Text>
             </TouchableOpacity>
         </View>
     );
@@ -289,7 +300,7 @@ export default function FavoritesScreen(): React.ReactNode {
         </View>
     );
 
-    if (error) {
+    if (error && !success && !loading) {
         return renderErrorState();
     }
 
@@ -305,7 +316,7 @@ export default function FavoritesScreen(): React.ReactNode {
                 >
                     <ChevronLeft size={24} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>My Favorites</Text>
+                <Text style={styles.headerTitle}>My Recipes</Text>
             </View>
 
             {/* Search & Filter Section */}
@@ -484,7 +495,11 @@ export default function FavoritesScreen(): React.ReactNode {
                             activeTab === 'recipes' && styles.activeTabText,
                         ]}
                     >
-                        Recipes ({recipeCount})
+                        Recipes{' '}
+                        {recipeCount > 0
+                            ? `(${recipeCount})`
+                            : ``
+                        }
                     </Text>
                 </TouchableOpacity>
 
