@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import React, { memo, useCallback, useMemo, useRef, useEffect } from 'react';
 
+// import Hooks
 import useRecipeScreenFetcher from '@/hooks/useRecipeScreenFetcher';
+
 import { RecipeCard } from '@/components/RecipeCard';
 import { Recipe } from '@/assets/types/types';
 import { router } from 'expo-router';

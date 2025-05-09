@@ -204,7 +204,13 @@ export default function HomeScreenRecentChats() {
         <View>
             <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Recent Chats</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() =>
+                        router.push({
+                            pathname: '/(tabs)/chats',
+                        })
+                    }
+                >
                     <Text style={styles.seeAllText}>See all</Text>
                 </TouchableOpacity>
             </View>
@@ -262,9 +268,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     seeAllText: {
-        color: '#007AFF',
         fontSize: 14,
-        marginRight: 4,
+        color: '#FE724C',
     },
     chatItemContainer: {
         marginHorizontal: 16,
@@ -342,7 +347,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginBottom: 12,
         marginTop: 20,
-    
     },
     sectionTitle: {
         fontSize: 18,

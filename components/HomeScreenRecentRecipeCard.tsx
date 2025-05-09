@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
     Image,
     StyleSheet,
@@ -14,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCarouselRecipe } from '@/hooks/useCarouselRecipe';
 import { MaterialIcons } from '@expo/vector-icons';
 import SkeletonLoadingItem from './SkeletonLoadingItem';
+import { firestore, auth } from '@/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 interface Props {
     toggleSaved: (id: string) => void;
@@ -24,6 +27,24 @@ export default function HomeScreenRecentRecipeCard({ toggleSaved }: Props) {
     const { recipe, loading: recipeLoading, error } = useCarouselRecipe();
 
     const displayedRecipes = recipe?.slice(0, 4);
+
+    const [isSaved, setIsSaved] = useState<number[]>([]);
+
+    const currentUser = auth.currentUser;
+    const userId = currentUser?.uid;
+    const savedRef = userId
+        ? collection(firestore, 'users', userId, 'savedRecipes')
+        : null;
+
+    useEffect(() => {
+        const fetchSavedRecipes = async () => {
+            if (savedRef) {
+                const savedSnap = await getDocs(savedRef);
+                setIsSaved(savedSnap.docs.map((doc) => Number(doc.id)));
+            }
+        };
+        fetchSavedRecipes();
+    }, [savedRef]);
 
     const renderRecentRecipe = ({ item }: { item: Recipe }) => (
         <TouchableOpacity
@@ -67,9 +88,17 @@ export default function HomeScreenRecentRecipeCard({ toggleSaved }: Props) {
                 onPress={() => toggleSaved(item.id.toString())}
             >
                 <Ionicons
-                    name={item.saved ? 'bookmark' : 'bookmark-outline'}
+                    name={
+                        isSaved.includes(Number(item.id))
+                            ? 'bookmark'
+                            : 'bookmark-outline'
+                    }
                     size={16}
-                    color={item.saved ? '#FE724C' : '#777777'}
+                    color={
+                        isSaved.includes(Number(item.id))
+                            ? '#FE724C'
+                            : '#777777'
+                    }
                 />
             </TouchableOpacity>
         </TouchableOpacity>

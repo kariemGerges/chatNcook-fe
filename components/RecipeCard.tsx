@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import type { Recipe } from '@/assets/types/types';
+// import hooks
+import { useToggleSaved } from '@/hooks/useToggleSaved';
 
 interface RecipeCardProps {
     recipe: Recipe;
@@ -18,6 +20,8 @@ interface RecipeCardProps {
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+
+    const { toggleSavedRecipe } = useToggleSaved();
 
     // Animation setup
     const scaleValue = useState(new Animated.Value(1))[0];
@@ -53,7 +57,11 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <View style={styles.imageContainer}>
                 <Image
                     defaultSource={require('@/assets/images/sginup.webp')}
-                    source={{ uri: recipe?.image_url? recipe.image_url : 'https://example.com/default-image.jpg' }}
+                    source={{
+                        uri: recipe?.image_url
+                            ? recipe.image_url
+                            : 'https://example.com/default-image.jpg',
+                    }}
                     style={styles.image}
                     resizeMode="cover"
                 />
@@ -143,7 +151,10 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         </Pressable>
 
                         <Pressable
-                            onPress={() => setIsSaved(!isSaved)}
+                            onPress={() => {
+                                setIsSaved(!isSaved);
+                                toggleSavedRecipe((recipe.id).toString());
+                            }}
                             style={styles.actionButton}
                         >
                             <FontAwesome
