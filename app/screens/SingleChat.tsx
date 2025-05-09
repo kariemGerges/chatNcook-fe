@@ -16,7 +16,7 @@ import {
   ImageBackground
 } from 'react-native';
 import { ArrowLeft, Circle } from 'lucide-react';
-import { router, useRouter } from 'expo-router';
+import { router } from 'expo-router';
 
 interface Message {
   id: number;

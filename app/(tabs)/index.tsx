@@ -32,8 +32,8 @@ export default function HomeScreen() {
 
                 {/* Recent Recipes */}
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSavedRecipe} />
-                <AiFab />
             </ScrollView>
+            <AiFab announce={true} />
         </SafeAreaView>
     );
 }

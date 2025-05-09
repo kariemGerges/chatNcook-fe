@@ -213,113 +213,115 @@ export default function RecipeDetails() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  imageContainer: {
-    height: HEADER_HEIGHT,
-    width: '100%',
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  contentContainer: {
-    padding: 16,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: '#FFEBC6',
-    marginTop: -24,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  iconButton: {
-    padding: 8,
-  },
-  metaInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 24,
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  tagText: {
-    color: '#666',
-    fontSize: 12,
-  },
-  section: {
-    marginBottom: 24,
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-    borderRadius: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#333',
-  },
-  description: {
-    color: '#444',
-    lineHeight: 24,
-  },
-  ingredientRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  ingredient: {
-    color: '#444',
-    flex: 1,
-    lineHeight: 20,
-  },
-  steps: {
-    color: '#444',
-    lineHeight: 24,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 16,
+    },
+    loadingText: {
+        fontSize: 16,
+        color: '#666',
+    },
+    imageContainer: {
+        height: HEADER_HEIGHT,
+        width: '100%',
+        overflow: 'hidden',
+    },
+    image: {
+        backgroundColor: 'rgba(247, 182, 154, 0.3)',
+        width: '100%',
+        height: '100%',
+      resizeMode: 'cover',
+      
+    },
+    contentContainer: {
+        padding: 16,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        backgroundColor: '#FFEBC6',
+        marginTop: -24,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        flex: 1,
+    },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    iconButton: {
+        padding: 8,
+    },
+    metaInfo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    metaText: {
+        color: '#666',
+        fontSize: 14,
+    },
+    tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginBottom: 24,
+        gap: 8,
+    },
+    tag: {
+        backgroundColor: '#f0f0f0',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    tagText: {
+        color: '#666',
+        fontSize: 12,
+    },
+    section: {
+        marginBottom: 24,
+        backgroundColor: '#f8f8f8',
+        padding: 16,
+        borderRadius: 12,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 12,
+        color: '#333',
+    },
+    description: {
+        color: '#444',
+        lineHeight: 24,
+    },
+    ingredientRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    ingredient: {
+        color: '#444',
+        flex: 1,
+        lineHeight: 20,
+    },
+    steps: {
+        color: '#444',
+        lineHeight: 24,
+    },
 });
