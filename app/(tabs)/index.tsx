@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 // import Hooks
 import { useToggleSaved } from '@/hooks/useToggleSaved';
@@ -8,9 +8,11 @@ import HomeScreenRecipeCard from '@/components/HomeScreenRecipeCard';
 import HomeScreenRecentRecipeCard from '@/components/HomeScreenRecentRecipeCard';
 import HomeScreenRecentChats from '@/components/HomeScreenRecentChats';
 import { AiFab } from '@/components/AiFab';
+import { AiPromptSheet } from '@/components/AiPromptSheet';
 
 export default function HomeScreen() {
     const { toggleSavedRecipe } = useToggleSaved();
+    const sheetRef = useRef(null);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -33,7 +35,8 @@ export default function HomeScreen() {
                 {/* Recent Recipes */}
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSavedRecipe} />
             </ScrollView>
-            <AiFab announce={true} />
+            <AiPromptSheet ref={sheetRef} />
+            <AiFab onPress={() => sheetRef.current?.expand?.()} />
         </SafeAreaView>
     );
 }

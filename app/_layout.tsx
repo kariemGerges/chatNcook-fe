@@ -18,6 +18,7 @@ import { listenToAuthChanges } from '@/store/authListener';
 import { listenToUserChats } from '@/store/thunks/chatThunks';
 
 import { useAppSelector } from '@/store/hooks';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -63,20 +64,22 @@ export default function RootLayout() {
     }
 
     return (
-        <Provider store={store}>
-            <ThemeProvider
-                value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-            >
-                <ListenerInitializer />
-                <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen
-                        name="(tabs)"
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen name="+not-found" />
-                </Stack>
-                <StatusBar style="auto" />
-            </ThemeProvider>
-        </Provider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <Provider store={store}>
+                <ThemeProvider
+                    value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+                >
+                    <ListenerInitializer />
+                    <Stack screenOptions={{ headerShown: false }}>
+                        <Stack.Screen
+                            name="(tabs)"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen name="+not-found" />
+                    </Stack>
+                    <StatusBar style="auto" />
+                </ThemeProvider>
+            </Provider>
+        </GestureHandlerRootView>
     );
 }
