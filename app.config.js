@@ -19,6 +19,7 @@ export default {
             eas: {
                 projectId: 'c500099c-ee9d-47b3-8477-38f9a135610f',
             },
+            EXPO_PUBLIC_GEMINI_API_KEY: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
         },
         newArchEnabled: true,
         ios: {

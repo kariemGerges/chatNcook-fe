@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useMemo, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { getCookingAdviceGemini } from '@/utils/gemini';
@@ -7,21 +7,28 @@ export const AiPromptSheet = forwardRef<BottomSheet>((_, ref) => {
     const [prompt, setPrompt] = useState('');
     const [response, setResponse] = useState('');
 
+    // ✅ FIX: wrap snapPoints in useMemo
+    const snapPoints = useMemo(() => ['50%'], []);
+
     const sendPrompt = async () => {
         const result = await getCookingAdviceGemini(prompt);
         setResponse(result || 'No response from ChatNCook.');
     };
 
+    useEffect(() => {
+        console.log('[Sheet] mounted, ref =', ref);
+    }, []);
+
     return (
         <BottomSheet
             ref={ref}
-            index={-1}
-            snapPoints={['50%']}
+            index={0}
+            snapPoints={snapPoints}
             enablePanDownToClose
             backgroundStyle={{ borderRadius: 24 }}
         >
             <View style={styles.content}>
-                <Text style={styles.label}>Ask the AI 🤖</Text>
+                <Text style={styles.label}>Ask the ChatNCook 🤖</Text>
                 <TextInput
                     value={prompt}
                     onChangeText={setPrompt}
@@ -29,9 +36,7 @@ export const AiPromptSheet = forwardRef<BottomSheet>((_, ref) => {
                     style={styles.input}
                 />
                 <Button title="Send" onPress={sendPrompt} />
-                {response !== '' && (
-                    <Text style={styles.response}>{response}</Text>
-                )}
+                {response && <Text style={styles.response}>{response}</Text>}
             </View>
         </BottomSheet>
     );

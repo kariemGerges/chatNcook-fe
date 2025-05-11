@@ -104,7 +104,7 @@ export const AiFab = ({ onPress }: { onPress: () => void }) => {
         Animated.loop(
             Animated.sequence([
                 Animated.timing(pulse, {
-                    toValue: 1.2,
+                    toValue: 1.02,
                     duration: 800,
                     useNativeDriver: true,
                 }),
@@ -116,9 +116,13 @@ export const AiFab = ({ onPress }: { onPress: () => void }) => {
             ])
         ).start();
     }, []);
+    
 
     return (
-        <Pressable onPress={onPress} style={styles.container}>
+        <Pressable style={styles.container} onPress={() => {
+            onPress();
+            console.log('FAB Pressed');
+        }}>
             <Animated.View
                 style={[styles.fab, { transform: [{ scale: pulse }] }]}
             >

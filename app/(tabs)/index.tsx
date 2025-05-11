@@ -1,7 +1,10 @@
 import React, { useRef } from 'react';
-import { StyleSheet, ScrollView, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, ScrollView, SafeAreaView, StatusBar, View } from 'react-native';
+import BottomSheet from '@gorhom/bottom-sheet';
+
 // import Hooks
 import { useToggleSaved } from '@/hooks/useToggleSaved';
+
 // import components
 import { Header } from '@/components/Header';
 import HomeScreenRecipeCard from '@/components/HomeScreenRecipeCard';
@@ -12,7 +15,9 @@ import { AiPromptSheet } from '@/components/AiPromptSheet';
 
 export default function HomeScreen() {
     const { toggleSavedRecipe } = useToggleSaved();
-    const sheetRef = useRef(null);
+    const sheetRef = useRef<BottomSheet>(null);
+
+    console.log('[FAB] sheetRef:', sheetRef.current);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -35,8 +40,16 @@ export default function HomeScreen() {
                 {/* Recent Recipes */}
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSavedRecipe} />
             </ScrollView>
-            <AiPromptSheet ref={sheetRef} />
-            <AiFab onPress={() => sheetRef.current?.expand?.()} />
+            {/* Floating Action Button */}
+            <View style={{ flex: 1 }}>
+                <AiPromptSheet ref={sheetRef} />
+                <AiFab
+                    onPress={() => {
+                        console.log('FAB Pressed');
+                        sheetRef.current?.expand?.();
+                    }}
+                />
+            </View>
         </SafeAreaView>
     );
 }
