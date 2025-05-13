@@ -41,7 +41,6 @@ export default function HomeScreen() {
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSavedRecipe} />
             </ScrollView>
             {/* Floating Action Button */}
-            <View style={{ flex: 1 }}>
                 <AiPromptSheet ref={sheetRef} />
                 <AiFab
                     onPress={() => {
@@ -49,7 +48,6 @@ export default function HomeScreen() {
                         sheetRef.current?.expand?.();
                     }}
                 />
-            </View>
         </SafeAreaView>
     );
 }

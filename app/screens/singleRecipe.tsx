@@ -1,215 +1,297 @@
 // app/recipe/[id].tsx
-import { View, Text, Image, ScrollView, StyleSheet, Share, Pressable, Dimensions, ActivityIndicator } from 'react-native';
+import BottomSheet from '@gorhom/bottom-sheet';
+
+import {
+    View,
+    Text,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Share,
+    Pressable,
+    Dimensions,
+    ActivityIndicator,
+} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { Recipe } from '@/assets/types/types';
-import Animated, { 
-  FadeInDown, 
-  FadeIn, 
-  interpolate, 
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue
+import Animated, {
+    FadeInDown,
+    FadeIn,
+    interpolate,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    useSharedValue,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { AiFab } from '@/components/AiFab';
+import { AiPromptSheet } from '@/components/AiPromptSheet';
 
 const HEADER_HEIGHT = 250;
 const { width } = Dimensions.get('window');
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-const LoadingIndicator = memo(() => (
-  <ActivityIndicator size="large" />
-))
+const LoadingIndicator = memo(() => <ActivityIndicator size="large" />);
 
 export default function RecipeDetails() {
-  const { recipeDetail } = useLocalSearchParams();
-  const parsedRecipeDetail = recipeDetail ? JSON.parse(recipeDetail as string) : null;
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const scrollY = useSharedValue(0);
+    const { recipeDetail } = useLocalSearchParams();
+    const parsedRecipeDetail = recipeDetail
+        ? JSON.parse(recipeDetail as string)
+        : null;
+    const [recipe, setRecipe] = useState<Recipe | null>(null);
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const scrollY = useSharedValue(0);
 
-  useEffect(() => {
-    setRecipe(parsedRecipeDetail);
-    checkIfBookmarked();
-  }, []);
+    const sheetRef = useRef<BottomSheet>(null);
 
-  const checkIfBookmarked = async () => {
-    try {
-      const bookmarks = await AsyncStorage.getItem('bookmarkedRecipes');
-      if (bookmarks) {
-        const bookmarksList = JSON.parse(bookmarks);
-        setIsBookmarked(bookmarksList.includes(recipe?.id));
-      }
-    } catch (error) {
-      console.error('Error checking bookmarks:', error);
-    }
-  };
+    useEffect(() => {
+        setRecipe(parsedRecipeDetail);
+        checkIfBookmarked();
+    }, []);
 
-  const toggleBookmark = async () => {
-    try {
-      const bookmarks = await AsyncStorage.getItem('bookmarkedRecipes');
-      let bookmarksList = bookmarks ? JSON.parse(bookmarks) : [];
-      
-      if (isBookmarked) {
-        bookmarksList = bookmarksList.filter((bookmarkId: string) => bookmarkId !== recipe?.id as unknown as string);
-      } else {
-        bookmarksList.push(recipe?.id);
-      }
-      
-      await AsyncStorage.setItem('bookmarkedRecipes', JSON.stringify(bookmarksList));
-      setIsBookmarked(!isBookmarked);
-    } catch (error) {
-      console.error('Error toggling bookmark:', error);
-    }
-  };
-
-  const shareRecipe = async () => {
-    try {
-      await Share.share({
-        message: `Check out this amazing recipe for ${recipe?.title}! ${recipe?.description}`,
-        title: recipe?.title,
-      });
-    } catch (error) {
-      console.error('Error sharing recipe:', error);
-    }
-  };
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      scrollY.value,
-      [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-      [2, 1, 0.75]
-    );
-
-    const opacity = interpolate(
-      scrollY.value,
-      [0, HEADER_HEIGHT / 2],
-      [1, 0]
-    );
-
-    return {
-      transform: [{ scale }],
-      opacity,
+    const checkIfBookmarked = async () => {
+        try {
+            const bookmarks = await AsyncStorage.getItem('bookmarkedRecipes');
+            if (bookmarks) {
+                const bookmarksList = JSON.parse(bookmarks);
+                setIsBookmarked(bookmarksList.includes(recipe?.id));
+            }
+        } catch (error) {
+            console.error('Error checking bookmarks:', error);
+        }
     };
-  });
 
-  if (!recipe) {
+    const toggleBookmark = async () => {
+        try {
+            const bookmarks = await AsyncStorage.getItem('bookmarkedRecipes');
+            let bookmarksList = bookmarks ? JSON.parse(bookmarks) : [];
+
+            if (isBookmarked) {
+                bookmarksList = bookmarksList.filter(
+                    (bookmarkId: string) =>
+                        bookmarkId !== (recipe?.id as unknown as string)
+                );
+            } else {
+                bookmarksList.push(recipe?.id);
+            }
+
+            await AsyncStorage.setItem(
+                'bookmarkedRecipes',
+                JSON.stringify(bookmarksList)
+            );
+            setIsBookmarked(!isBookmarked);
+        } catch (error) {
+            console.error('Error toggling bookmark:', error);
+        }
+    };
+
+    const shareRecipe = async () => {
+        try {
+            await Share.share({
+                message: `Check out this amazing recipe for ${recipe?.title}! ${recipe?.description}`,
+                title: recipe?.title,
+            });
+        } catch (error) {
+            console.error('Error sharing recipe:', error);
+        }
+    };
+
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
+    const headerAnimatedStyle = useAnimatedStyle(() => {
+        const scale = interpolate(
+            scrollY.value,
+            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
+            [2, 1, 0.75]
+        );
+
+        const opacity = interpolate(
+            scrollY.value,
+            [0, HEADER_HEIGHT / 2],
+            [1, 0]
+        );
+
+        return {
+            transform: [{ scale }],
+            opacity,
+        };
+    });
+
+    const handleOpenSheet = useCallback(() => {
+        console.log('FAB Pressed, trying to open sheet');
+        console.log('Sheet ref status:', sheetRef.current);
+        sheetRef.current?.expand?.();
+    }, []);
+
+    if (!recipe) {
+        return (
+            <View style={styles.container}>
+                <Animated.View
+                    entering={FadeIn.duration(800)}
+                    style={styles.loadingContainer}
+                >
+                    <MaterialCommunityIcons
+                        name="food-variant"
+                        size={48}
+                        color="#666"
+                    />
+                    <Text style={styles.loadingText}>Loading recipe...</Text>
+                </Animated.View>
+            </View>
+        );
+    }
+
     return (
-      <View style={styles.container}>
-        <Animated.View 
-          entering={FadeIn.duration(800)}
-          style={styles.loadingContainer}
-        >
-          <MaterialCommunityIcons name="food-variant" size={48} color="#666" />
-          <Text style={styles.loadingText}>Loading recipe...</Text>
-        </Animated.View>
-      </View>
+        <View style={styles.container}>
+            <AnimatedScrollView
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+                showsVerticalScrollIndicator={false}
+            >
+                <Animated.View
+                    style={[styles.imageContainer, headerAnimatedStyle]}
+                >
+                    <Image
+                        source={{ uri: recipe.image_url }}
+                        style={styles.image}
+                        defaultSource={require('@/assets/images/sginup.webp')}
+                    />
+                </Animated.View>
+
+                <Animated.View
+                    entering={FadeInDown.duration(600).springify()}
+                    style={styles.contentContainer}
+                >
+                    <View style={styles.headerRow}>
+                        <Text style={styles.title}>{recipe.title}</Text>
+                        <View style={styles.actionButtons}>
+                            <Pressable
+                                onPress={shareRecipe}
+                                style={styles.iconButton}
+                            >
+                                <MaterialCommunityIcons
+                                    name="share-variant"
+                                    size={24}
+                                    color="#666"
+                                />
+                            </Pressable>
+                            <Pressable
+                                onPress={toggleBookmark}
+                                style={styles.iconButton}
+                            >
+                                <MaterialCommunityIcons
+                                    name={
+                                        isBookmarked
+                                            ? 'bookmark'
+                                            : 'bookmark-outline'
+                                    }
+                                    size={24}
+                                    color={isBookmarked ? '#ff6b6b' : '#666'}
+                                />
+                            </Pressable>
+                        </View>
+                    </View>
+
+                    <View style={styles.metaInfo}>
+                        <View style={styles.metaItem}>
+                            <MaterialCommunityIcons
+                                name="account-circle"
+                                size={20}
+                                color="#666"
+                            />
+                            <Text style={styles.metaText}>
+                                By {recipe.author}
+                            </Text>
+                        </View>
+                        <View style={styles.metaItem}>
+                            <MaterialCommunityIcons
+                                name="clock-outline"
+                                size={20}
+                                color="#666"
+                            />
+                            <Text style={styles.metaText}>
+                                {recipe.preparation_time}
+                            </Text>
+                        </View>
+                        <View style={styles.metaItem}>
+                            <MaterialCommunityIcons
+                                name="map-marker"
+                                size={20}
+                                color="#666"
+                            />
+                            <Text style={styles.metaText}>
+                                {recipe.country_of_origin}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.tagsContainer}>
+                        {recipe.tags?.map((tag, index) => (
+                            <Animated.View
+                                key={index}
+                                entering={FadeInDown.delay(index * 100)}
+                                style={styles.tag}
+                            >
+                                <Text style={styles.tagText}>{tag}</Text>
+                            </Animated.View>
+                        ))}
+                    </View>
+
+                    <Animated.View
+                        entering={FadeInDown.delay(200)}
+                        style={styles.section}
+                    >
+                        <Text style={styles.sectionTitle}>Description</Text>
+                        <Text style={styles.description}>
+                            {recipe.description}
+                        </Text>
+                    </Animated.View>
+
+                    <Animated.View
+                        entering={FadeInDown.delay(300)}
+                        style={styles.section}
+                    >
+                        <Text style={styles.sectionTitle}>Ingredients</Text>
+                        {recipe.ingredients?.map((ingredient, index) => (
+                            <View key={index} style={styles.ingredientRow}>
+                                <MaterialCommunityIcons
+                                    name="circle-small"
+                                    size={24}
+                                    color="#666"
+                                />
+                                <Text style={styles.ingredient}>
+                                    {ingredient}
+                                </Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+
+                    <Animated.View
+                        entering={FadeInDown.delay(400)}
+                        style={styles.section}
+                    >
+                        <Text style={styles.sectionTitle}>
+                            Preparation Steps
+                        </Text>
+                        <Text style={styles.steps}>
+                            {recipe.preparation_steps}
+                        </Text>
+                    </Animated.View>
+                </Animated.View>
+            </AnimatedScrollView>
+            {/* Floating Action Button */}
+            <AiPromptSheet ref={sheetRef} />
+
+            <AiFab onPress={handleOpenSheet} />
+        </View>
     );
-  }
-
-  return (
-    <View style={styles.container}>
-      <AnimatedScrollView
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View style={[styles.imageContainer, headerAnimatedStyle]}>
-          <Image
-            source={{ uri: recipe.image_url }}
-            style={styles.image}
-            defaultSource={require('@/assets/images/sginup.webp')}
-          />
-        </Animated.View>
-        
-        <Animated.View 
-          entering={FadeInDown.duration(600).springify()}
-          style={styles.contentContainer}
-        >
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>{recipe.title}</Text>
-            <View style={styles.actionButtons}>
-              <Pressable onPress={shareRecipe} style={styles.iconButton}>
-                <MaterialCommunityIcons name="share-variant" size={24} color="#666" />
-              </Pressable>
-              <Pressable onPress={toggleBookmark} style={styles.iconButton}>
-                <MaterialCommunityIcons 
-                  name={isBookmarked ? "bookmark" : "bookmark-outline"} 
-                  size={24} 
-                  color={isBookmarked ? "#ff6b6b" : "#666"} 
-                />
-              </Pressable>
-            </View>
-          </View>
-          
-          <View style={styles.metaInfo}>
-            <View style={styles.metaItem}>
-              <MaterialCommunityIcons name="account-circle" size={20} color="#666" />
-              <Text style={styles.metaText}>By {recipe.author}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <MaterialCommunityIcons name="clock-outline" size={20} color="#666" />
-              <Text style={styles.metaText}>{recipe.preparation_time}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <MaterialCommunityIcons name="map-marker" size={20} color="#666" />
-              <Text style={styles.metaText}>{recipe.country_of_origin}</Text>
-            </View>
-          </View>
-
-          <View style={styles.tagsContainer}>
-            {recipe.tags?.map((tag, index) => (
-              <Animated.View 
-                key={index}
-                entering={FadeInDown.delay(index * 100)}
-                style={styles.tag}
-              >
-                <Text style={styles.tagText}>{tag}</Text>
-              </Animated.View>
-            ))}
-          </View>
-
-          <Animated.View 
-            entering={FadeInDown.delay(200)}
-            style={styles.section}
-          >
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{recipe.description}</Text>
-          </Animated.View>
-
-          <Animated.View 
-            entering={FadeInDown.delay(300)}
-            style={styles.section}
-          >
-            <Text style={styles.sectionTitle}>Ingredients</Text>
-            {recipe.ingredients?.map((ingredient, index) => (
-              <View key={index} style={styles.ingredientRow}>
-                <MaterialCommunityIcons name="circle-small" size={24} color="#666" />
-                <Text style={styles.ingredient}>{ingredient}</Text>
-              </View>
-            ))}
-          </Animated.View>
-
-          <Animated.View 
-            entering={FadeInDown.delay(400)}
-            style={styles.section}
-          >
-            <Text style={styles.sectionTitle}>Preparation Steps</Text>
-            <Text style={styles.steps}>{recipe.preparation_steps}</Text>
-          </Animated.View>
-        </Animated.View>
-      </AnimatedScrollView>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -236,8 +318,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(247, 182, 154, 0.3)',
         width: '100%',
         height: '100%',
-      resizeMode: 'cover',
-      
+        resizeMode: 'cover',
     },
     contentContainer: {
         padding: 16,

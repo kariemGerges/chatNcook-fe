@@ -1,94 +1,35 @@
-// // HomeScreen.tsx
-// import {
-//     View,
-//     Text,
-//     StyleSheet,
-//     TouchableOpacity,
-//     Dimensions,
-// } from 'react-native';
-// import { router } from 'expo-router';
-// import { useEffect } from 'react';
-// import { MaterialIcons } from '@expo/vector-icons';
-// import { Header } from '@/components/Header';
-// import HomeScreenRecipeCard from '@/components/HomeScreenRecipeCard';
-// import HomeScreenRecentChats from '@/components/HomeScreenRecentChats';
+import BottomSheet from '@gorhom/bottom-sheet';
 
-// import { RootState } from '@/store';
-// import { useSelector } from 'react-redux';
+import React, { useCallback, useRef } from 'react';
+import { View, Text } from 'react-native';
 
-// const { width } = Dimensions.get('window');
+import { AiFab } from '@/components/AiFab';
+import { AiPromptSheet } from '@/components/AiPromptSheet';
 
-// export default function HomeScreen() {
+export default function TestScreen() {
+    const sheetRef = useRef<BottomSheet>(null);
 
-//     // Getting user data from Redux read slice
-//     const {
-//         user,
-//         loading: userLoading,
-//         userError,
-//     } = useSelector((state: RootState) => state.user);
+    const handleOpenSheet = useCallback(() => {
+        console.log('FAB Pressed, trying to open sheet');
+        console.log('Sheet ref status:', sheetRef.current);
+        sheetRef.current?.expand?.();
+    }, []);
 
-//     // Redirect to welcome screen if user is not logged in
-//     useEffect(() => {
-//         if (!user && !userLoading) {
-//             // router.push('/screens/welcomeScreen');
-//             router.push('/screens/testscreen')
-//         } else if (userError) {
-//             router.push('/+not-found');
-//         }
-//     }, [user, userLoading]);
+    return (
+        <View
+            style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#F8F8F8',
+            }}
+        >
+            <Text style={{ fontSize: 20 }}>Test Screen</Text>
+            <Text style={{ fontSize: 16 }}>This is the test screen.</Text>
 
-//     return (
-//         <View style={styles.container}>
-//             <Header />
-//             <HomeScreenRecipeCard />
+            <AiPromptSheet ref={sheetRef} />
 
-//             <View style={styles.chatHeader}>
-//                 <Text style={styles.recentChatsTitle}>Recent Chats</Text>
-//                 <TouchableOpacity
-//                     onPress={() => router.push('/chat')}
-//                     style={styles.seeAllButton}
-//                 >
-//                     <Text style={styles.seeAllText}>See all</Text>
-//                     <MaterialIcons
-//                         name="arrow-forward"
-//                         size={16}
-//                         color="#007AFF"
-//                     />
-//                 </TouchableOpacity>
-//             </View>
-
-//             <HomeScreenRecentChats />
-//         </View>
-//     );
-// }
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: '#FFEBC6',
-//     },
-//     chatHeader: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         alignItems: 'center',
-//         paddingHorizontal: 16,
-//         marginTop: 8,
-//         marginBottom: 16,
-//         backgroundColor: '#FFEBC6',
-//     },
-//     recentChatsTitle: {
-//         paddingVertical: 16,
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//         color: '#5C4033',
-//     },
-//     seeAllButton: {
-//         flexDirection: 'row',
-//         alignItems: 'center',
-//     },
-//     seeAllText: {
-//         color: '#007AFF',
-//         fontSize: 14,
-//         marginRight: 4,
-//     },
-// });
+            <AiFab onPress={handleOpenSheet} />
+        </View>
+    );
+}

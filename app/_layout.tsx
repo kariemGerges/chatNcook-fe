@@ -1,3 +1,6 @@
+import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import {
     DarkTheme,
     DefaultTheme,
@@ -8,7 +11,6 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // redux store imports
@@ -18,7 +20,7 @@ import { listenToAuthChanges } from '@/store/authListener';
 import { listenToUserChats } from '@/store/thunks/chatThunks';
 
 import { useAppSelector } from '@/store/hooks';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -70,13 +72,15 @@ export default function RootLayout() {
                     value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
                 >
                     <ListenerInitializer />
-                    <Stack screenOptions={{ headerShown: false }}>
-                        <Stack.Screen
-                            name="(tabs)"
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen name="+not-found" />
-                    </Stack>
+                    <BottomSheetModalProvider>
+                        <Stack screenOptions={{ headerShown: false }}>
+                            <Stack.Screen
+                                name="(tabs)"
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen name="+not-found" />
+                        </Stack>
+                    </BottomSheetModalProvider>
                     <StatusBar style="auto" />
                 </ThemeProvider>
             </Provider>
