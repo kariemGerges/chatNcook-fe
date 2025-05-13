@@ -1,11 +1,5 @@
 // import React, { useEffect, useRef } from 'react';
-// import {
-//     Animated,
-//     Pressable,
-//     StyleSheet,
-//     SafeAreaView,
-//     Platform,
-// } from 'react-native';
+// import { StyleSheet, Pressable, SafeAreaView, Animated, Platform } from 'react-native';
 // import { MaterialCommunityIcons } from '@expo/vector-icons';
 // import * as Haptics from 'expo-haptics';
 
@@ -43,7 +37,7 @@
 //         <SafeAreaView style={styles.safeArea}>
 //             <Pressable
 //                 onPress={() => {
-//                     Haptics.selectionAsync();
+                   
 //                     globalThis.askSheet?.present(); // exposed by AskSheet below
 //                 }}
 //                 style={styles.container}
@@ -93,51 +87,61 @@
 //         elevation: 10, // Increased elevation for Android
 //     },
 // });
+
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export const AiFab = ({ onPress }: { onPress: () => void }) => {
-    const pulse = useRef(new Animated.Value(1)).current;
+interface AiFabProps {
+    onPress: () => void;
+    announce?: boolean;
+}
 
+export const AiFab = ({ onPress, announce }: AiFabProps) => {
+    const scale = useRef(new Animated.Value(1)).current;
     useEffect(() => {
+        if (!announce) return;
         Animated.loop(
             Animated.sequence([
-                Animated.timing(pulse, {
-                    toValue: 1.02,
+                Animated.timing(scale, {
+                    toValue: 1.05,
                     duration: 800,
                     useNativeDriver: true,
                 }),
-                Animated.timing(pulse, {
+                Animated.timing(scale, {
                     toValue: 1,
                     duration: 800,
                     useNativeDriver: true,
                 }),
             ])
         ).start();
-    }, []);
-    
+    }, [announce]);
 
     return (
-        <Pressable style={styles.container} onPress={() => {
-            onPress();
-            console.log('FAB Pressed');
-        }}>
-            <Animated.View
-                style={[styles.fab, { transform: [{ scale: pulse }] }]}
-            >
+        <TouchableOpacity
+            style={styles.fabContainer}
+            onPress={onPress}
+            activeOpacity={0.8}
+        >
+            <Animated.View style={[styles.fab, { transform: [{ scale }] }]}>
                 <MaterialCommunityIcons
-                    name="robot-happy"
+                    name="robot-happy-outline"
                     size={28}
                     color="white"
                 />
             </Animated.View>
-        </Pressable>
+        </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { position: 'absolute', bottom: 24, right: 24, zIndex: 200 },
+    // FAB styles
+    fabContainer: {
+        position: 'absolute',
+        bottom: 24,
+        right: 24,
+        zIndex: 9999,
+    },
     fab: {
         backgroundColor: '#FF6B35',
         width: 56,
@@ -145,8 +149,13 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 6,
         shadowColor: '#000',
-        shadowOpacity: 0.25,
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
     },
 });

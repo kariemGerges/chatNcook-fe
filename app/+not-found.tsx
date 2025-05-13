@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import { Link, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+
 
 const NotFoundScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const router = useRouter();
+
     const [currentJoke, setCurrentJoke] = useState(0);
     const bounceAnim = new Animated.Value(0);
     const rotateAnim = new Animated.Value(0);
@@ -82,7 +84,8 @@ const NotFoundScreen: React.FC = () => {
     });
 
     const goToHome = () => {
-        navigation.navigate('RecipeList' as never);
+        // navigation.navigate('RecipeList' as never);
+        router.push('/' as never);
     };
 
     return (

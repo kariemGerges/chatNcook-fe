@@ -22,8 +22,6 @@ export const getCookingAdviceGemini = async (
 ): Promise<string | null> => {
     const fullPrompt = `${systemPrompt}\nUser: ${userPrompt}`;
 
-    console.log('Gemini key:', apiKey);
-
     try {
         const res = await axios.post(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
@@ -31,9 +29,16 @@ export const getCookingAdviceGemini = async (
                 contents: [{ parts: [{ text: fullPrompt }] }],
             }
         );
+        console.log('Gemini response:', res.data);
+        console.log(
+            'Gemini response:',
+            res.data.candidates[0].content.parts[0].text
+        );
         return res.data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+        
     } catch (error) {
         console.error('[Gemini Cooking Agent Error]', error);
         return null;
     }
 };
+
