@@ -81,12 +81,10 @@ export default function HomeScreen() {
     const [isModalVisible, setModalVisible] = useState(false);
 
     const handleOpenModal = () => {
-        console.log('Opening AI Modal');
         setModalVisible(true);
     };
 
     const handleCloseModal = () => {
-        console.log('Closing AI Modal');
         setModalVisible(false);
     };
 
@@ -112,7 +110,7 @@ export default function HomeScreen() {
                 <HomeScreenRecentRecipeCard toggleSaved={toggleSavedRecipe} />
             </ScrollView>
 
-            {/* AI Components - Now using simple Modal approach */}
+            {/* AI Components*/}
             <AiPromptSheet
                 isVisible={isModalVisible}
                 onClose={handleCloseModal}

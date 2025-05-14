@@ -43,6 +43,15 @@ export default function RecipeDetails() {
         : null;
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const handleOpenModal = () => {
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+    };
     const scrollY = useSharedValue(0);
 
     const sheetRef = useRef<BottomSheet>(null);
@@ -286,10 +295,12 @@ export default function RecipeDetails() {
                     </Animated.View>
                 </Animated.View>
             </AnimatedScrollView>
-            {/* Floating Action Button */}
-            <AiPromptSheet ref={sheetRef} />
-
-            <AiFab onPress={handleOpenSheet} />
+            {/*AI Components - Floating Action Button */}
+            <AiPromptSheet
+                isVisible={isModalVisible}
+                onClose={handleCloseModal}
+            />
+            <AiFab onPress={handleOpenModal} />
         </View>
     );
 }

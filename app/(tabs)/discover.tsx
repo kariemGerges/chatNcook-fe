@@ -131,6 +131,7 @@ export default function RecipeScreen() {
                         maxToRenderPerBatch={10}
                         windowSize={21} // Increased from 5 to 21 (each window is 10 items)
                         updateCellsBatchingPeriod={100} // Increased from 50 to 100ms
+                        showsHorizontalScrollIndicator={false}
                         maintainVisibleContentPosition={{
                             minIndexForVisible: 0,
                             autoscrollToTopThreshold: 10,
@@ -145,6 +146,7 @@ export default function RecipeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#F8F9FA',
     },
     sectionTitle: {
         fontSize: 22,
