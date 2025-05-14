@@ -28,7 +28,6 @@ const useRecipeFetcherByUserId = (
                 const response = await axios.get(
                     `https://chatncook-be.onrender.com/recipes/${query}`
                 );
-                // console.log('Response data:', response.data);
 
                 // Check if response.data has the expected structure
                 if (response.data?.data && Array.isArray(response.data.data)) {

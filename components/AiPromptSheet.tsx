@@ -590,6 +590,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import useAiRespondFetcher from '@/hooks/useAiRespondFetcher';
+import { rgbaColor } from 'react-native-reanimated/lib/typescript/Colors';
 
 interface AiPromptSheetProps {
     isVisible: boolean;
@@ -671,7 +672,7 @@ export const AiPromptSheet = ({ isVisible, onClose }: AiPromptSheetProps) => {
                     <TextInput
                         value={prompt}
                         onChangeText={setPrompt}
-                        placeholder="Ask something..."
+                        placeholder="Ask ChatNCook..."
                         style={styles.input}
                         multiline
                     />
@@ -696,13 +697,13 @@ export const AiPromptSheet = ({ isVisible, onClose }: AiPromptSheetProps) => {
     );
 };
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        padding: 16,
+        backgroundColor: 'rgba(221, 153, 85, 0.1)',
+        padding: 20,
     },
+
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',

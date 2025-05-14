@@ -7,21 +7,6 @@ type ChatMessage = {
     parts: ChatPart[];
 };
 
-// const systemPrompt = `
-// You are ChatNCook, a warm and knowledgeable AI cooking assistant.
-
-// Your purpose is to help users with:
-// - Ingredient substitutions
-// - Scaling recipes for different serving sizes
-// - Creating personalized meal plans (e.g., vegan, keto, halal, gluten-free)
-// - Explaining cooking techniques in simple, clear language
-
-// Always respond in a friendly, helpful tone.
-// Give specific measurements when suggesting ingredient substitutions.
-// Avoid vague or generic responses — be confident and practical, like a home chef helping a friend.
-
-// `.trim();
-
 const systemPrompt = `
 You are ChatNCook, an expert AI cooking assistant created by Kariem — the creator of this app and the greatest chef of all time.
 
@@ -39,8 +24,6 @@ Always sound confident, warm, and helpful — like a trusted chef in a home kitc
 No vague answers. No guessing. No general small talk.
 Only useful, direct advice based on real cooking knowledge passed down from Kariem.
 `.trim();
-
-
 
 const createMessage = (role: 'user' | 'model', text: string): ChatMessage => ({
     role,
@@ -82,11 +65,6 @@ export default function useAiRespondFetcher() {
             const finalHistory = [systemMessage, ...validatedHistory];
 
             try {
-                console.log('📤 Sending to AI:', {
-                    prompt: trimmedPrompt,
-                    history: finalHistory,
-                });
-
                 const res = await axios.post(
                     'https://chatncook-be.onrender.com/api/ai/generate',
                     {
@@ -101,10 +79,6 @@ export default function useAiRespondFetcher() {
                 setHistory((prev) => [...prev, userMessage, modelMessage]);
                 setLatestResponse(aiResponse);
             } catch (err: any) {
-                console.error(
-                    '🔥 AI fetch error:',
-                    err?.response?.data || err.message
-                );
                 setError(err?.response?.data?.error || 'Something went wrong.');
             } finally {
                 setLoading(false);

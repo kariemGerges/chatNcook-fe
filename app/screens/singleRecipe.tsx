@@ -133,12 +133,6 @@ export default function RecipeDetails() {
         };
     });
 
-    const handleOpenSheet = useCallback(() => {
-        console.log('FAB Pressed, trying to open sheet');
-        console.log('Sheet ref status:', sheetRef.current);
-        sheetRef.current?.expand?.();
-    }, []);
-
     if (!recipe) {
         return (
             <View style={styles.container}>

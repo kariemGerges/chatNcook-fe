@@ -68,7 +68,7 @@ export default function RecipeScreen() {
                 onPress={() =>
                     router.push({
                         pathname: '/screens/singleRecipe',
-                        params: { recipeDetail: JSON.stringify(item) },
+                        params: { recipeDetail: JSON.stringify(item), },
                     })
                 }
             >

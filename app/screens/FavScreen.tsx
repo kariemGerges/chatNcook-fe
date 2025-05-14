@@ -220,7 +220,7 @@ export default function FavoritesScreen(): React.ReactNode {
     // Navigate to collection details
     const goToCollectionDetails = (collectionId: string) => {
         // In a real app, you would navigate to the collection details screen
-        console.log(`Navigate to collection ${collectionId}`);
+        // console.log(`Navigate to collection ${collectionId}`);
         // router.push(`/collection/${collectionId}`);
     };
 

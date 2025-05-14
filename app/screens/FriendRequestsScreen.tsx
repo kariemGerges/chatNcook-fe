@@ -66,10 +66,6 @@ const FriendRequestsScreen = () => {
             return;
         }
 
-        console.log('Accepting request from:', requesterId);
-        console.log('Current user ID:', currentUser.uid);
-        console.log('Dispatching acceptFriendRequest action');
-
         dispatch(acceptFriendRequest(currentUser.uid, requesterId))
             .then(() => {
                 Alert.alert('Success', 'Friend request accepted');
@@ -114,9 +110,6 @@ const FriendRequestsScreen = () => {
 
     const renderReceivedRequestItem = ({ item }: { item: FriendRequest }) => {
         if (!item.from) return null;
-
-        console.log('Received request item:', item);
-        console.log('Attempting to accept request from:', item.userId);
 
         return (
             <View style={styles.requestItem}>

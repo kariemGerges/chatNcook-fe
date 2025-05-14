@@ -187,7 +187,6 @@ const MobileProfile: React.FC = () => {
 
         try {
             await signOut(auth); // Sign out the user
-            console.log('User signed out successfully');
         } catch (error) {
             console.error('Error signing out:', error);
         }
