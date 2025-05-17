@@ -3,10 +3,10 @@ import 'dotenv/config';
 export default {
     expo: {
         name: 'cookandchat',
-        slug: 'cookandchat',
+        slug: 'chatcook-client',
         version: '1.0.0',
         orientation: 'portrait',
-        icon: './assets/images/icon.png',
+        icon: './assets/images/carousel.png',
         scheme: 'myapp',
         userInterfaceStyle: 'automatic',
         extra: {
@@ -26,6 +26,7 @@ export default {
             supportsTablet: true,
         },
         android: {
+            package: 'com.kariemgerges.chatncook',
             adaptiveIcon: {
                 foregroundImage: './assets/images/adaptive-icon.png',
                 backgroundColor: '#ffffff',
@@ -51,5 +52,5 @@ export default {
         experiments: {
             typedRoutes: true,
         },
-    }
+    },
 };
